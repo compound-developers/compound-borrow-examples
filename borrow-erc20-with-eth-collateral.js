@@ -82,14 +82,12 @@ const main = async () => {
   let {1:collateralFactor} = await comptroller.methods.markets(cDaiAddress).call();
   collateralFactor = (collateralFactor / 1e18) * 100; // Convert to percent
 
-
   console.log('Fetching DAI price from the price oracle...');
   let daiPriceInEth = await priceOracle.methods.getUnderlyingPrice(cDaiAddress).call();
   daiPriceInEth = daiPriceInEth / 1e18;
 
-
-  console.log(`\nYou have ${liquidity} of liquid ETH pooled in Compound.`);
-  console.log(`You can borrow up to ${collateralFactor}% of your total assets in Compound as DAI.`);
+  console.log(`\nYou have ${liquidity} of LIQUID assets (worth of ETH) pooled in Compound.`);
+  console.log(`You can borrow up to ${collateralFactor}% of your TOTAL assets supplied to Compound as DAI.`);
   console.log(`1 DAI == ${daiPriceInEth.toFixed(6)} ETH`);
   console.log(`You can borrow up to ${liquidity/daiPriceInEth} DAI from Compound.\n`);
 
