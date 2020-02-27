@@ -1,15 +1,17 @@
 {
   "name": "compound-borrow-guide",
   "version": "1.0.0",
-  "description": "",
-  "main": "testing.js",
+  "description": "Example code for borrowing crypto assets from Compound Protocol money markets.",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "Compound Labs, Inc.",
+  "license": "MIT",
   "dependencies": {
-    "web3": "^1.2.6"
+    "ganache-cli": "^6.8.2",
+    "solc": "0.5.12",
+    "web3": "^1.2.5"
   }
 }
