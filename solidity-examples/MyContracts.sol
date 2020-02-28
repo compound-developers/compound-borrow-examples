@@ -75,11 +75,55 @@ contract MyContract {
     return true;
   }
 
-  // function supplyErc20BorrowEth(
-  //   address _erc20Contract,
-  //   address _cErc20Contract,
-  //   uint256 _numTokensToSupply
-  // ) public returns (uint) {
-  //   return 1;
-  // }
+  function supplyErc20BorrowEth(
+    address payable _cEtherAddress,
+    address _comptrollerAddress,
+    address _cDaiAddress,
+    address _daiAddress,
+    uint _daiToSupplyAsCollateral
+  ) public returns (bool)
+  {
+    CEth cEth = CEth(_cEtherAddress);
+    Comptroller comptroller = Comptroller(_comptrollerAddress);
+    CErc20 cDai = CErc20(_cDaiAddress);
+    Erc20 dai = Erc20(_daiAddress);
+
+    // Approve transfer of DAI
+    dai.approve(_cDaiAddress, _daiToSupplyAsCollateral);
+
+    // Supply DAI as collateral, get cDAI in return
+    uint error = cDai.mint(_daiToSupplyAsCollateral);
+    require(error == 0, "CErc20.mint Error");
+
+    // Enter the DAI market so you can borrow another type of asset
+    address[] memory cTokens = new address[](1);
+    cTokens[0] = _cDaiAddress;
+    uint[] memory errors = comptroller.enterMarkets(cTokens);
+    if (errors[0] != 0) {
+      revert("Comptroller.enterMarkets failed.");
+    }
+
+    // Get my account's total liquidity value in Compound
+    (
+      uint error2,
+      uint liquidity,
+      uint shortfall
+    ) = comptroller.getAccountLiquidity(address(this));
+    if (error2 != 0) {
+      revert("Comptroller.getAccountLiquidity failed.");
+    }
+    require(shortfall == 0, "account underwater");
+    require(liquidity > 0, "account has excess collateral");
+
+    // Borrow half of allowed borrow as ETH
+    uint numWeiToBorrow = liquidity / 2;
+
+    // Borrow DAI, check the DAI balance for this contract's address
+    cEth.borrow(numWeiToBorrow);
+
+    return true;
+  }
+
+  // Need this to receive ETH when `supplyErc20BorrowEth` executes
+  function () external payable {}
 }
