@@ -12,7 +12,7 @@ const {
   daiAbi,
   cDaiAddress,
   cDaiAbi
-} = require('./contracts.json');
+} = require('../contracts.json');
 
 // Your Ethereum wallet private key
 const privateKey = 'b8c1b5c1d81f9475fdf2e334517d29f733bdfa40682207571b12fc1142cbf329';

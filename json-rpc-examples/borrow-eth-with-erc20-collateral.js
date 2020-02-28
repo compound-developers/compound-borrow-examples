@@ -14,7 +14,7 @@ const {
   daiAbi,
   cDaiAddress,
   cDaiAbi
-} = require('./contracts.json');
+} = require('../contracts.json');
 
 // Your Ethereum wallet private key
 const privateKey = 'b8c1b5c1d81f9475fdf2e334517d29f733bdfa40682207571b12fc1142cbf329';
@@ -58,13 +58,6 @@ const main = async () => {
 
   let daiToSupplyAsCollateral = '15';
   daiToSupplyAsCollateral = web3.utils.toWei(daiToSupplyAsCollateral, 'ether');
-
-  console.log('\nApproving DAI to transfer from your wallet to Compound...');
-  await dai.methods.approve(cDaiAddress, daiToSupplyAsCollateral).send({
-    from: myWalletAddress,
-    gasLimit: web3.utils.toHex(150000),     // posted at compound.finance/developers#gas-costs
-    gasPrice: web3.utils.toHex(20000000000) // use ethgasstation.info (mainnet only)
-  })
 
   console.log('\nSupplying DAI to Compound as collateral (you will get cDAI in return)...\n');
   let mint = await cDai.methods.mint(web3.utils.toBN(daiToSupplyAsCollateral)).send({
