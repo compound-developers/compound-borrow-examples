@@ -59,12 +59,26 @@ const main = async () => {
   let daiToSupplyAsCollateral = '15';
   daiToSupplyAsCollateral = web3.utils.toWei(daiToSupplyAsCollateral, 'ether');
 
-  console.log('\nSupplying DAI to Compound as collateral (you will get cDAI in return)...\n');
-  let mint = await cDai.methods.mint(web3.utils.toBN(daiToSupplyAsCollateral)).send({
+  console.log('\nApproving DAI to be transferred from your wallet to the cDAI contract...\n');
+  await dai.methods.approve(cDaiAddress, daiToSupplyAsCollateral).send({
     from: myWalletAddress,
-    gasLimit: web3.utils.toHex(600000),      // posted at compound.finance/developers#gas-costs
+    gasLimit: web3.utils.toHex(100000),     // posted at compound.finance/developers#gas-costs
     gasPrice: web3.utils.toHex(20000000000), // use ethgasstation.info (mainnet only)
   });
+
+  console.log('Supplying DAI to Compound as collateral (you will get cDAI in return)...\n');
+  let mint = await cDai.methods.mint(daiToSupplyAsCollateral).send({
+    from: myWalletAddress,
+    gasLimit: web3.utils.toHex(1000000),      // posted at compound.finance/developers#gas-costs
+    gasPrice: web3.utils.toHex(20000000000), // use ethgasstation.info (mainnet only)
+  });
+
+  if (mint.events && mint.events.Failure) {
+    throw new Error(
+      `See https://compound.finance/developers/ctokens#ctoken-error-codes\n` +
+      `Code: ${mint.events.Failure.returnValues[0]}\n`
+    );
+  }
 
   await logBalances();
 
@@ -80,8 +94,8 @@ const main = async () => {
   let {1:liquidity} = await comptroller.methods.getAccountLiquidity(myWalletAddress).call();
   liquidity = web3.utils.fromWei(liquidity).toString();
 
-  console.log("Fetching Compound's DAI collateral factor...");
-  let {1:collateralFactor} = await comptroller.methods.markets(cDaiAddress).call();
+  console.log("Fetching Compound's ETH collateral factor...");
+  let {1:collateralFactor} = await comptroller.methods.markets(cEthAddress).call();
   collateralFactor = (collateralFactor / 1e18) * 100; // Convert to percent
 
   console.log('Fetching DAI price from the price oracle...');
