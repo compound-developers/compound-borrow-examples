@@ -83,15 +83,19 @@ Running these scripts will give your contract address **ETH** and **DAI**. cToke
 ## Output Examples
 
 **Borrow ETH via JSON RPC**
+
 [Output Example GitHub Gist](https://gist.github.com/ajb413/79fd9f93b0b1a19ce2472de3f69956bf)
 
 **Borrow ERC20 via JSON RPC**
+
 [Output Example GitHub Gist](https://gist.github.com/ajb413/cd11dacd9fb32e904810aa8e737e3cc0)
 
 **Borrow ETH via Solidity**
+
 [Output Example GitHub Gist](https://gist.github.com/ajb413/7d0424d879f6960ee8bddaa75e74600c)
 
 **Borrow ERC20 Token via Solidity**
+
 [Output Example GitHub Gist](https://gist.github.com/ajb413/2bd8ef5fa45aa7d07a6e027bd3b9231a)
 
 ## Minting Test DAI
