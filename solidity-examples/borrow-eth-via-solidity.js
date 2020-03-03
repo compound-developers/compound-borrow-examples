@@ -44,11 +44,13 @@ const logBalances = () => {
     const myContractEthBalance = +web3.utils.fromWei(await web3.eth.getBalance(myContractAddress));
     const myContractCEthBalance = await cEth.methods.balanceOf(myContractAddress).call() / 1e8;
     const myContractDaiBalance = +await dai.methods.balanceOf(myContractAddress).call() / 1e18;
+    const myContractCDaiBalance = +await cDai.methods.balanceOf(myContractAddress).call() / 1e8;
 
     console.log("My Wallet's   DAI Balance:", myWalletDaiBalance);
     console.log("MyContract's  ETH Balance:", myContractEthBalance);
     console.log("MyContract's cETH Balance:", myContractCEthBalance);
     console.log("MyContract's  DAI Balance:", myContractDaiBalance);
+    console.log("MyContract's cDAI Balance:", myContractCDaiBalance);
 
     resolve();
   });
@@ -59,7 +61,7 @@ const main = async () => {
 
   const daiToSupplyAsCollateral = '15';
   const daiMantissa = web3.utils.toWei(daiToSupplyAsCollateral, 'ether');
-  console.log(`\nSending ${daiToSupplyAsCollateral} DAI to MyContract so it can provice collateral...\n`);
+  console.log(`\nSending ${daiToSupplyAsCollateral} DAI to MyContract so it can provide collateral...\n`);
 
   // Send DAI to MyContract before attempting the supply
   await dai.methods.transfer(myContractAddress, daiMantissa).send({
