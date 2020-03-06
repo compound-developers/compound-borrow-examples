@@ -44,7 +44,7 @@ cd compound-supply-examples/
 - `-i` Sets an explicit network ID to avoid confusion and errors.
 - `-u` Unlocks an address so you can write to your localhost test blockchain without knowing that address's private key. We are unlocking the above address so we can mint our own test DAI on our localhost test net. The address for minting DAI changes occasionally (see **Minting Test DAI** section below for updating).
 
-## Borrowing Assets Directly via JSON RPC
+## Borrowing Assets Directly via Web3 JSON RPC
 These code examples can be run by a web browser or with Node.js. If you want to use a web browser, you'll need to import the web3.js script in your HTML or JS file (see import above).
 
 Running these scripts will give your wallet borrowed **ETH** and **DAI**. cTokens are ERC20 Tokens that can be **used to redeem an ever-increasing amount of the underlying asset**. The cToken exchange rate **increases every Ethereum block**, they can be transferred, and can be used to redeem at any time, as long as it does not put your borrowing account under water.
@@ -82,11 +82,11 @@ Running these scripts will give your contract address **ETH** and **DAI**. cToke
 
 ## Output Examples
 
-**Borrow ETH via JSON RPC**
+**Borrow ETH via Web3 JSON RPC**
 
 [Output Example GitHub Gist](https://gist.github.com/ajb413/79fd9f93b0b1a19ce2472de3f69956bf)
 
-**Borrow ERC20 via JSON RPC**
+**Borrow ERC20 via Web3 JSON RPC**
 
 [Output Example GitHub Gist](https://gist.github.com/ajb413/cd11dacd9fb32e904810aa8e737e3cc0)
 

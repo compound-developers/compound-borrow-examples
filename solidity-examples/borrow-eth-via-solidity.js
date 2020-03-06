@@ -81,7 +81,23 @@ const main = async () => {
     daiMantissa
   ).send({
     from: myWalletAddress,
-    gasLimit: web3.utils.toHex(6000000),      // posted at compound.finance/developers#gas-costs
+    gasLimit: web3.utils.toHex(6000000),     // posted at compound.finance/developers#gas-costs
+    gasPrice: web3.utils.toHex(20000000000), // use ethgasstation.info (mainnet only)
+  });
+
+  // Uncomment this line to see the Solidity logs
+  // console.log(result, JSON.stringify(result));
+
+  await logBalances();
+
+  console.log(`\nNow repaying the borrow...\n`);
+  const ethToRepayBorrow = 0.02;
+  result = await myContract.methods.myEthRepayBorrow(
+      cEthAddress,
+      web3.utils.toWei(ethToRepayBorrow.toString(), 'ether')
+    ).send({
+    from: myWalletAddress,
+    gasLimit: web3.utils.toHex(5000000),      // posted at compound.finance/developers#gas-costs
     gasPrice: web3.utils.toHex(20000000000), // use ethgasstation.info (mainnet only)
   });
 

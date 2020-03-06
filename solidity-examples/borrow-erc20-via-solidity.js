@@ -71,6 +71,20 @@ const main = async () => {
   // console.log('result', JSON.stringify(result));
 
   await logBalances();
+
+  console.log(`\nNow repaying the borrow...\n`);
+  const daiToRepayBorrow = 10;
+  result = await myContract.methods.myErc20RepayBorrow(
+      daiAddress,
+      cDaiAddress,
+      web3.utils.toWei(daiToRepayBorrow.toString(), 'ether')
+    ).send({
+    from: myWalletAddress,
+    gasLimit: web3.utils.toHex(5000000),      // posted at compound.finance/developers#gas-costs
+    gasPrice: web3.utils.toHex(20000000000), // use ethgasstation.info (mainnet only)
+  });
+
+  await logBalances();
 };
 
 main().catch(async (err) => {

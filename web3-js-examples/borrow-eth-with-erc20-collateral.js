@@ -94,21 +94,26 @@ const main = async () => {
   let {1:liquidity} = await comptroller.methods.getAccountLiquidity(myWalletAddress).call();
   liquidity = web3.utils.fromWei(liquidity).toString();
 
-  console.log("Fetching Compound's ETH collateral factor...");
-  let {1:collateralFactor} = await comptroller.methods.markets(cEthAddress).call();
+  console.log("Fetching Compound's DAI collateral factor...");
+  let {1:collateralFactor} = await comptroller.methods.markets(cDaiAddress).call();
   collateralFactor = (collateralFactor / 1e18) * 100; // Convert to percent
 
   console.log('Fetching DAI price from the price oracle...');
   let daiPriceInEth = await priceOracle.methods.getUnderlyingPrice(cDaiAddress).call();
   daiPriceInEth = daiPriceInEth / 1e18;
 
+  console.log('Fetching borrow rate per block for ETH borrowing...');
+  let borrowRate = await cEth.methods.borrowRatePerBlock().call();
+  borrowRate = borrowRate / 1e18;
+
   console.log(`\nYou have ${liquidity} of LIQUID assets (worth of ETH) pooled in Compound.`);
   console.log(`You can borrow up to ${collateralFactor}% of your TOTAL assets supplied to Compound as ETH.`);
   console.log(`1 DAI == ${daiPriceInEth.toFixed(6)} ETH`);
   console.log(`You can borrow up to ${liquidity} ETH from Compound.\n`);
+  console.log(`\nYour borrowed amount INCREASES (${borrowRate} * borrowed amount) ETH per block.\nThis is based on the current borrow rate.`);
 
-  // Let's try to borrow 90% of our liquid assets (maximum 100%)
-  const ethToBorrow = liquidity * 0.9;
+  // Let's try to borrow 0.02 ETH (or another amount far below the borrow limit)
+  const ethToBorrow = 0.02;
   console.log(`Now attempting to borrow ${ethToBorrow} ETH...`);
   await cEth.methods.borrow(web3.utils.toWei(ethToBorrow.toString(), 'ether')).send({
     from: myWalletAddress,
@@ -116,6 +121,32 @@ const main = async () => {
     gasPrice: web3.utils.toHex(20000000000), // use ethgasstation.info (mainnet only)
   });
 
+  await logBalances();
+
+  console.log('\nFetching your ETH borrow balance from cETH contract...');
+  let balance = await cEth.methods.borrowBalanceCurrent(myWalletAddress).call();
+  balance = balance / 1e18; // because DAI is a 1e18 scaled token.
+  console.log(`Borrow balance is ${balance} ETH`);
+
+  console.log(`\nThis part is when you do something with those borrowed assets!\n`);
+
+  console.log(`Now repaying the borrow...`);
+
+  const ethToRepay = ethToBorrow;
+  const repayBorrow = await cEth.methods.repayBorrow().send({
+    from: myWalletAddress,
+    gasLimit: web3.utils.toHex(600000),      // posted at compound.finance/developers#gas-costs
+    gasPrice: web3.utils.toHex(20000000000), // use ethgasstation.info (mainnet only)
+    value: web3.utils.toWei(ethToRepay.toString(), 'ether')
+  });
+
+  if (repayBorrow.events && repayBorrow.events.Failure) {
+    const errorCode = repayBorrow.events.Failure.returnValues.error;
+    console.error(`repayBorrow error, code ${errorCode}`);
+    process.exit(12);
+  }
+
+  console.log(`\nBorrow repaid.\n`);
   await logBalances();
 };
 
