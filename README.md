@@ -84,7 +84,57 @@ Running these scripts will give your contract address **ETH** and **DAI**. cToke
 
 **Borrow ETH via Web3 JSON RPC**
 
-[Output Example GitHub Gist](https://gist.github.com/ajb413/79fd9f93b0b1a19ce2472de3f69956bf)
+<details><summary>Output Example (CLICK ME)</summary>
+<p>
+
+```
+My Wallet's  ETH Balance: 100
+My Wallet's cETH Balance: 0
+My Wallet's  DAI Balance: 0
+
+Supplying ETH to Compound as collateral (you will get cETH in return)...
+
+My Wallet's  ETH Balance: 98.9978876
+My Wallet's cETH Balance: 49.97131893
+My Wallet's  DAI Balance: 0
+
+Entering market (via Comptroller contract) for ETH (as collateral)...
+Calculating your liquid assets in Compound...
+Fetching cETH collateral factor...
+Fetching DAI price from the price oracle...
+Fetching borrow rate per block for DAI borrowing...
+
+You have 0.749999999913076963 of LIQUID assets (worth of ETH) pooled in Compound.
+You can borrow up to 75% of your TOTAL assets supplied to Compound as DAI.
+1 DAI == 0.004205 ETH
+You can borrow up to 178.3599922379794 DAI from Compound.
+NEVER borrow near the maximum amount because your account will be instantly liquidated.
+
+Your borrowed amount INCREASES (3.8729687868e-8 * borrowed amount) DAI per block.
+This is based on the current borrow rate.
+
+Now attempting to borrow 50 DAI...
+My Wallet's  ETH Balance: 98.98883272
+My Wallet's cETH Balance: 49.97131893
+My Wallet's  DAI Balance: 50
+
+Fetching DAI borrow balance from cDAI contract...
+Borrow balance is 50 DAI
+
+This part is when you do something with those borrowed assets!
+
+Now repaying the borrow...
+Approving DAI to be transferred from your wallet to the cDAI contract...
+
+Borrow repaid.
+
+My Wallet's  ETH Balance: 98.98353318
+My Wallet's cETH Balance: 49.97131893
+My Wallet's  DAI Balance: 0
+
+```
+</p>
+</details>
 
 **Borrow ERC20 via Web3 JSON RPC**
 

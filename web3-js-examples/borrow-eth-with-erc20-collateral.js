@@ -109,12 +109,13 @@ const main = async () => {
   console.log(`\nYou have ${liquidity} of LIQUID assets (worth of ETH) pooled in Compound.`);
   console.log(`You can borrow up to ${collateralFactor}% of your TOTAL assets supplied to Compound as ETH.`);
   console.log(`1 DAI == ${daiPriceInEth.toFixed(6)} ETH`);
-  console.log(`You can borrow up to ${liquidity} ETH from Compound.\n`);
+  console.log(`You can borrow up to ${liquidity} ETH from Compound.`);
+  console.log(`NEVER borrow near the maximum amount because your account will be instantly liquidated.`);
   console.log(`\nYour borrowed amount INCREASES (${borrowRate} * borrowed amount) ETH per block.\nThis is based on the current borrow rate.`);
 
   // Let's try to borrow 0.02 ETH (or another amount far below the borrow limit)
   const ethToBorrow = 0.02;
-  console.log(`Now attempting to borrow ${ethToBorrow} ETH...`);
+  console.log(`\nNow attempting to borrow ${ethToBorrow} ETH...`);
   await cEth.methods.borrow(web3.utils.toWei(ethToBorrow.toString(), 'ether')).send({
     from: myWalletAddress,
     gasLimit: web3.utils.toHex(600000),      // posted at compound.finance/developers#gas-costs

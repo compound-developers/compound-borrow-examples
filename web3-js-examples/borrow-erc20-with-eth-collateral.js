@@ -94,6 +94,7 @@ const main = async () => {
   console.log(`You can borrow up to ${collateralFactor}% of your TOTAL assets supplied to Compound as DAI.`);
   console.log(`1 DAI == ${daiPriceInEth.toFixed(6)} ETH`);
   console.log(`You can borrow up to ${liquidity/daiPriceInEth} DAI from Compound.`);
+  console.log(`NEVER borrow near the maximum amount because your account will be instantly liquidated.`);
   console.log(`\nYour borrowed amount INCREASES (${borrowRate} * borrowed amount) DAI per block.\nThis is based on the current borrow rate.\n`);
 
   const daiToBorrow = 50;

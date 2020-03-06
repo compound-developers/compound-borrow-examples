@@ -83,12 +83,12 @@ contract MyContract {
         require(shortfall == 0, "account underwater");
         require(liquidity > 0, "account has excess collateral");
 
-        // Get the collateral factor for the asset we want to borrow
+        // Get the collateral factor for out collateral
         // (
         //   bool isListed,
         //   uint collateralFactorMantissa
-        // ) = comptroller.markets(_cDaiAddress);
-        // emit MyLog('DAI Collateral Factor', collateralFactorMantissa);
+        // ) = comptroller.markets(_cEthAddress);
+        // emit MyLog('ETH Collateral Factor', collateralFactorMantissa);
 
         // Get the amount of DAI added to your borrow each block
         // uint borrowRateMantissa = cDai.borrowRatePerBlock();
