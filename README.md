@@ -82,9 +82,9 @@ Running these scripts will give your contract address **ETH** and **DAI**. cToke
 
 ## Output Examples
 
-**Borrow ETH via Web3 JSON RPC**
+**Borrow ERC20 via Web3 JSON RPC**
 
-<details><summary>Output Example (CLICK ME)</summary>
+<details><summary>Output Example</summary>
 <p>
 
 ```
@@ -136,17 +136,126 @@ My Wallet's  DAI Balance: 0
 </p>
 </details>
 
-**Borrow ERC20 via Web3 JSON RPC**
+**Borrow ETH via Web3 JSON RPC**
 
-[Output Example GitHub Gist](https://gist.github.com/ajb413/cd11dacd9fb32e904810aa8e737e3cc0)
+<details><summary>Output Example</summary>
+<p>
 
-**Borrow ETH via Solidity**
+```
+My Wallet's  ETH Balance: 100
+My Wallet's cDAI Balance: 0
+My Wallet's  DAI Balance: 500
 
-[Output Example GitHub Gist](https://gist.github.com/ajb413/7d0424d879f6960ee8bddaa75e74600c)
+Approving DAI to be transferred from your wallet to the cDAI contract...
 
-**Borrow ERC20 Token via Solidity**
+Supplying DAI to Compound as collateral (you will get cDAI in return)...
 
-[Output Example GitHub Gist](https://gist.github.com/ajb413/2bd8ef5fa45aa7d07a6e027bd3b9231a)
+My Wallet's  ETH Balance: 99.99413216
+My Wallet's cDAI Balance: 738.43696251
+My Wallet's  DAI Balance: 485
+
+Entering market (via Comptroller contract) for ETH (as collateral)...
+Calculating your liquid assets in Compound...
+Fetching Compound's DAI collateral factor...
+Fetching DAI price from the price oracle...
+Fetching borrow rate per block for ETH borrowing...
+
+You have 0.047306012369014631 of LIQUID assets (worth of ETH) pooled in Compound.
+You can borrow up to 75% of your TOTAL assets supplied to Compound as ETH.
+1 DAI == 0.004205 ETH
+You can borrow up to 0.047306012369014631 ETH from Compound.
+NEVER borrow near the maximum amount because your account will be instantly liquidated.
+
+Your borrowed amount INCREASES (9.667017768e-9 * borrowed amount) ETH per block.
+This is based on the current borrow rate.
+
+Now attempting to borrow 0.02 ETH...
+My Wallet's  ETH Balance: 100.00848898
+My Wallet's cDAI Balance: 738.43696251
+My Wallet's  DAI Balance: 485
+
+Fetching your ETH borrow balance from cETH contract...
+Borrow balance is 0.02 ETH
+
+This part is when you do something with those borrowed assets!
+
+Now repaying the borrow...
+
+Borrow repaid.
+
+My Wallet's  ETH Balance: 99.98644126
+My Wallet's cDAI Balance: 738.43696251
+My Wallet's  DAI Balance: 485
+```
+</p>
+</details>
+
+**Borrow ERC20 via Solidity**
+
+<details><summary>Output Example</summary>
+<p>
+
+```
+My Wallet's   ETH Balance: 99.97545332
+MyContract's  ETH Balance: 0
+MyContract's cETH Balance: 0
+MyContract's  DAI Balance: 0
+
+Calling MyContract.supplyEthBorrowErc20 with 1 ETH for collateral...
+
+My Wallet's   ETH Balance: 98.96209
+MyContract's  ETH Balance: 0
+MyContract's cETH Balance: 49.97131876
+MyContract's  DAI Balance: 10
+
+Now repaying the borrow...
+
+My Wallet's   ETH Balance: 98.95721348
+MyContract's  ETH Balance: 0
+MyContract's cETH Balance: 49.97131876
+MyContract's  DAI Balance: 0
+```
+</p>
+</details>
+
+**Borrow ETH Token via Solidity**
+
+<details><summary>Output Example</summary>
+<p>
+
+```
+My Wallet's   DAI Balance: 500
+MyContract's  ETH Balance: 0
+MyContract's cETH Balance: 0
+MyContract's  DAI Balance: 0
+MyContract's cDAI Balance: 0
+
+Sending 15 DAI to MyContract so it can provide collateral...
+
+My Wallet's   DAI Balance: 485
+MyContract's  ETH Balance: 0
+MyContract's cETH Balance: 0
+MyContract's  DAI Balance: 15
+MyContract's cDAI Balance: 0
+
+Calling MyContract.supplyErc20BorrowEth with 15 DAI for collateral...
+
+My Wallet's   DAI Balance: 485
+MyContract's  ETH Balance: 0.02
+MyContract's cETH Balance: 0
+MyContract's  DAI Balance: 0
+MyContract's cDAI Balance: 738.43236084
+
+Now repaying the borrow...
+
+My Wallet's   DAI Balance: 485
+MyContract's  ETH Balance: 0
+MyContract's cETH Balance: 0
+MyContract's  DAI Balance: 0
+MyContract's cDAI Balance: 738.43236084
+```
+</p>
+</details>
 
 ## Minting Test DAI
 To mint some DAI for your test network, you must use the **Join DAI** address. This can be unlocked when running Ganache CLI. You'll need to update the Join DAI address and the contract address each time the DAI contracts are updated. 
