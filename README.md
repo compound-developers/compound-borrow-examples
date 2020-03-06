@@ -2,7 +2,7 @@
 
 Examples for borrowing Ethereum assets to the [Compound Protocol](https://compound.finance/?ref=github&user=ajb413&repo=compound-borrow-examples).
 
-If you want to borrow assets directly from the protocol from your Ethereum wallet using JSON RPC and Web3.js, see the `json-rpc-examples` folder. JSON RPC can be utilized in the **web browser or with Node.js**.
+If you want to borrow assets directly from the protocol from your Ethereum wallet using JSON RPC and Web3.js, see the `web3-js-examples` folder. JSON RPC can be utilized in the **web browser or with Node.js**.
 
 If you want to borrow assets from the protocol from your Ethereum smart contract, see the `solidity-examples` folder.
 
@@ -52,14 +52,14 @@ Running these scripts will give your wallet borrowed **ETH** and **DAI**. cToken
 ### Localhost Test Net
 - Run your local test net in a second command line window **using the command above**.
 - If you are using DAI as collateral (an ERC20 token example), you need to **first** mint some for your wallet using `node mint-testnet-dai.js`. You may need to update the DAI main net contract address and the `MCD_JOIN_DAI` address in the script. This changes periodically as DAI is improved (see **Minting Test DAI** section below for updating).
-- `cd json-rpc-examples/`
+- `cd web3-js-examples/`
 - `node supply-eth-via-json-rpc.js` To supply ETH.
 - `node supply-erc20-via-json-rpc.js` To supply some DAI. The same code can be used for any other [ERC20 token that Compound supports](https://compound.finance/markets?ref=github&user=ajb413&repo=compound-supply-examples).
 
 ### Public Test Net or Main Net
 - Make sure you have a wallet with ETH for the Ethereum network you plan to interface with (Main, Ropsten, Kovan, etc.).
 - Insert the private key of your wallet in the scripts where noted. It's a best practice to insert the private key using an environment variable instead of revealing it in the code with a string literal.
-- Replace the HTTP provider in the `web3` constructors in the scripts in `json-rpc-examples/`. Replace it using the string provided by the "Endpoint" selector in your Infura project dashboard. The local test net provider is `http://127.0.0.1:8545`.
+- Replace the HTTP provider in the `web3` constructors in the scripts in `web3-js-examples/`. Replace it using the string provided by the "Endpoint" selector in your Infura project dashboard. The local test net provider is `http://127.0.0.1:8545`.
 - Next, replace the contract addresses in the JSON file with the most recent ones. You can find Compound's cToken contract addresses for each network on this page: [https://compound.finance/developers#networks](https://compound.finance/developers#networks). The DAI contract address can be found in the Maker DAO website change logs [https://changelog.makerdao.com/](https://changelog.makerdao.com/).
 
 ## Borrowing Assets via Solidity Smart Contracts
