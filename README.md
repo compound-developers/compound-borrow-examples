@@ -82,7 +82,7 @@ Running these scripts will give your contract address **ETH** and **DAI**. cToke
 
 ## Output Examples
 
-**Borrow ERC20 via Web3 JSON RPC**
+**Borrow ERC20 via Web3 JavaScript**
 
 <details><summary>Output Example</summary>
 <p>
@@ -136,7 +136,7 @@ My Wallet's  DAI Balance: 0
 </p>
 </details>
 
-**Borrow ETH via Web3 JSON RPC**
+**Borrow ETH via Web3 JavaScript**
 
 <details><summary>Output Example</summary>
 <p>
