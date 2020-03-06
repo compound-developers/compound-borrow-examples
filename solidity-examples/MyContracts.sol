@@ -180,12 +180,12 @@ contract MyContract {
         // in your account being liquidated instantly
         emit MyLog("Maximum ETH Borrow (borrow far less!)", liquidity);
 
-        // Get the collateral factor for the asset we want to borrow
+        // Get the collateral factor for our collateral
         // (
         //   bool isListed,
         //   uint collateralFactorMantissa
-        // ) = comptroller.markets(_cEtherAddress);
-        // emit MyLog('ETH Collateral Factor', collateralFactorMantissa);
+        // ) = comptroller.markets(_cDaiAddress);
+        // emit MyLog('DAI Collateral Factor', collateralFactorMantissa);
 
         // Get the amount of ETH added to your borrow each block
         // uint borrowRateMantissa = cEth.borrowRatePerBlock();
