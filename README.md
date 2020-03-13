@@ -196,23 +196,23 @@ My Wallet's  DAI Balance: 485
 <p>
 
 ```
-My Wallet's   ETH Balance: 99.97545332
+My Wallet's   ETH Balance: 99.97418948
 MyContract's  ETH Balance: 0
 MyContract's cETH Balance: 0
 MyContract's  DAI Balance: 0
 
-Calling MyContract.supplyEthBorrowErc20 with 1 ETH for collateral...
+Calling MyContract.borrowErc20Example with 1 ETH for collateral...
 
-My Wallet's   ETH Balance: 98.96209
+My Wallet's   ETH Balance: 98.9607079
 MyContract's  ETH Balance: 0
-MyContract's cETH Balance: 49.97131876
+MyContract's cETH Balance: 49.97124348
 MyContract's  DAI Balance: 10
 
 Now repaying the borrow...
 
-My Wallet's   ETH Balance: 98.95721348
+My Wallet's   ETH Balance: 98.95576444
 MyContract's  ETH Balance: 0
-MyContract's cETH Balance: 49.97131876
+MyContract's cETH Balance: 49.97124348
 MyContract's  DAI Balance: 0
 ```
 </p>
@@ -238,13 +238,13 @@ MyContract's cETH Balance: 0
 MyContract's  DAI Balance: 15
 MyContract's cDAI Balance: 0
 
-Calling MyContract.supplyErc20BorrowEth with 15 DAI for collateral...
+Calling MyContract.borrowEthExample with 15 DAI for collateral...
 
 My Wallet's   DAI Balance: 485
 MyContract's  ETH Balance: 0.02
 MyContract's cETH Balance: 0
 MyContract's  DAI Balance: 0
-MyContract's cDAI Balance: 738.43236084
+MyContract's cDAI Balance: 737.03979461
 
 Now repaying the borrow...
 
@@ -252,7 +252,7 @@ My Wallet's   DAI Balance: 485
 MyContract's  ETH Balance: 0
 MyContract's cETH Balance: 0
 MyContract's  DAI Balance: 0
-MyContract's cDAI Balance: 738.43236084
+MyContract's cDAI Balance: 737.03979461
 ```
 </p>
 </details>

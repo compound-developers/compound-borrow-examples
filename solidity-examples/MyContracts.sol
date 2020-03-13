@@ -27,6 +27,8 @@ interface CEth {
     function borrow(uint256) external returns (uint256);
 
     function repayBorrow() external payable;
+
+    function borrowBalanceCurrent(address) external returns (uint256);
 }
 
 
@@ -52,12 +54,12 @@ interface PriceOracle {
 contract MyContract {
     event MyLog(string, uint256);
 
-    function supplyEthBorrowErc20(
+    function borrowErc20Example(
         address payable _cEtherAddress,
         address _comptrollerAddress,
         address _priceOracleAddress,
         address _cDaiAddress
-    ) public payable returns (bool) {
+    ) public payable returns (uint256) {
         CEth cEth = CEth(_cEtherAddress);
         Comptroller comptroller = Comptroller(_comptrollerAddress);
         PriceOracle priceOracle = PriceOracle(_priceOracleAddress);
@@ -83,7 +85,7 @@ contract MyContract {
         require(shortfall == 0, "account underwater");
         require(liquidity > 0, "account has excess collateral");
 
-        // Get the collateral factor for out collateral
+        // Get the collateral factor for our collateral
         // (
         //   bool isListed,
         //   uint collateralFactorMantissa
@@ -113,7 +115,7 @@ contract MyContract {
         uint256 borrows = cDai.borrowBalanceCurrent(address(this));
         emit MyLog("Current DAI borrow amount", borrows);
 
-        return true;
+        return borrows;
     }
 
     function myEthRepayBorrow(address _cEtherAddress, uint256 amount)
@@ -140,13 +142,13 @@ contract MyContract {
         return true;
     }
 
-    function supplyErc20BorrowEth(
+    function borrowEthExample(
         address payable _cEtherAddress,
         address _comptrollerAddress,
         address _cDaiAddress,
         address _daiAddress,
         uint256 _daiToSupplyAsCollateral
-    ) public returns (bool) {
+    ) public returns (uint) {
         CEth cEth = CEth(_cEtherAddress);
         Comptroller comptroller = Comptroller(_comptrollerAddress);
         CErc20 cDai = CErc20(_cDaiAddress);
@@ -197,9 +199,12 @@ contract MyContract {
         // Borrow DAI, check the DAI balance for this contract's address
         cEth.borrow(numWeiToBorrow);
 
-        return true;
+        uint256 borrows = cEth.borrowBalanceCurrent(address(this));
+        emit MyLog("Current ETH borrow amount", borrows);
+
+        return borrows;
     }
 
-    // Need this to receive ETH when `supplyErc20BorrowEth` executes
+    // Need this to receive ETH when `borrowEthExample` executes
     function() external payable {}
 }

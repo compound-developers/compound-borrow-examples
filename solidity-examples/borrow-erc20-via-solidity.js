@@ -55,8 +55,8 @@ const main = async () => {
 
   const ethToSupplyAsCollateral = '1';
 
-  console.log(`\nCalling MyContract.supplyEthBorrowErc20 with ${ethToSupplyAsCollateral} ETH for collateral...\n`);
-  let result = await myContract.methods.supplyEthBorrowErc20(
+  console.log(`\nCalling MyContract.borrowErc20Example with ${ethToSupplyAsCollateral} ETH for collateral...\n`);
+  let result = await myContract.methods.borrowErc20Example(
       cEthAddress,
       comptrollerAddress,
       priceOracleAddress,
@@ -68,7 +68,8 @@ const main = async () => {
     value: web3.utils.toHex(web3.utils.toWei(ethToSupplyAsCollateral, 'ether'))
   });
 
-  // console.log('result', JSON.stringify(result));
+  // See the solidity functions logs from "MyLog" event
+  // console.log(result.events.MyLog);
 
   await logBalances();
 

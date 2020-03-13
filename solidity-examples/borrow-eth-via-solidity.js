@@ -72,8 +72,8 @@ const main = async () => {
 
   await logBalances();
 
-  console.log(`\nCalling MyContract.supplyErc20BorrowEth with ${daiToSupplyAsCollateral} DAI for collateral...\n`);
-  let result = await myContract.methods.supplyErc20BorrowEth(
+  console.log(`\nCalling MyContract.borrowEthExample with ${daiToSupplyAsCollateral} DAI for collateral...\n`);
+  let result = await myContract.methods.borrowEthExample(
     cEthAddress,
     comptrollerAddress,
     cDaiAddress,
@@ -85,8 +85,8 @@ const main = async () => {
     gasPrice: web3.utils.toHex(20000000000), // use ethgasstation.info (mainnet only)
   });
 
-  // Uncomment this line to see the Solidity logs
-  // console.log(result, JSON.stringify(result));
+  // See the solidity functions logs from "MyLog" event
+  // console.log(result.events.MyLog);
 
   await logBalances();
 
