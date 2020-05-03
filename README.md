@@ -53,8 +53,8 @@ Running these scripts will give your wallet borrowed **ETH** and **DAI**. cToken
 - Run your local test net in a second command line window **using the command above**.
 - If you are using DAI as collateral (an ERC20 token example), you need to **first** mint some for your wallet using `node mint-testnet-dai.js`. You may need to update the DAI main net contract address and the `MCD_JOIN_DAI` address in the script. This changes periodically as DAI is improved (see **Minting Test DAI** section below for updating).
 - `cd web3-js-examples/`
-- `node supply-eth-via-json-rpc.js` To supply ETH.
-- `node supply-erc20-via-json-rpc.js` To supply some DAI. The same code can be used for any other [ERC20 token that Compound supports](https://compound.finance/markets?ref=github&user=ajb413&repo=compound-supply-examples).
+- `node borrow-erc20-with-eth-collateral.js` To supply ETH and borrow DAI.
+- `node borrow-eth-with-erc20-collateral.js` To supply some DAI and borrow ETH. The same code can be used for some other [ERC20 token that Compound supports](https://compound.finance/markets?ref=github&user=ajb413&repo=compound-supply-examples). Remember to use assets with non-zero collateral factors.
 
 ### Public Test Net or Main Net
 - Make sure you have a wallet with ETH for the Ethereum network you plan to interface with (Main, Ropsten, Kovan, etc.).
