@@ -10,8 +10,8 @@
   "author": "Compound Labs, Inc.",
   "license": "MIT",
   "dependencies": {
-    "ganache-cli": "^6.8.2",
+    "ganache-cli": "^6.10.1",
     "solc": "0.5.12",
-    "web3": "^1.2.5"
+    "web3": "^1.2.11"
   }
 }
