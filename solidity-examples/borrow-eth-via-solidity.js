@@ -4,16 +4,9 @@
 const Web3 = require('web3');
 const web3 = new Web3('http://127.0.0.1:8545');
 const {
-  cEthAddress,
   cEthAbi,
-  comptrollerAddress,
-  comptrollerAbi,
-  priceOracleAddress,
-  priceOracleAbi,
-  daiAddress,
-  daiAbi,
-  cDaiAddress,
-  cDaiAbi
+  cErcAbi,
+  erc20Abi,
 } = require('../contracts.json');
 
 // Your Ethereum wallet private key
@@ -23,34 +16,48 @@ const privateKey = 'b8c1b5c1d81f9475fdf2e334517d29f733bdfa40682207571b12fc1142cb
 web3.eth.accounts.wallet.add('0x' + privateKey);
 const myWalletAddress = web3.eth.accounts.wallet[0].address;
 
-// Main Net Contract for cDAI (https://compound.finance/developers#networks)
-const cDai = new web3.eth.Contract(cDaiAbi, cDaiAddress);
+// Mainnet Contract for the Comptroller
+const comptrollerAddress = '0x3d9819210a31b4961b30ef54be2aed79b9c9cd3b';
 
-// Main Net Contract for cETH
+// Mainnet Contract for cETH
+const cEthAddress = '0x4ddc2d193948926d02f9b1fe9e1daa0718270ed5';
 const cEth = new web3.eth.Contract(cEthAbi, cEthAddress);
 
-// Main net address of DAI contract
-// https://etherscan.io/address/0x6b175474e89094c44da98b954eedeac495271d0f
-const dai = new web3.eth.Contract(daiAbi, daiAddress);
+// Mainnet address of underlying token (like DAI or USDC)
+const underlyingAddress = '0x6b175474e89094c44da98b954eedeac495271d0f'; // Dai
+const underlying = new web3.eth.Contract(erc20Abi, underlyingAddress);
+
+// Mainnet address for a cToken (like cDai, https://compound.finance/docs#networks)
+const cTokenAddress = '0x5d3a536e4d6dbd6114cc1ead35777bab948e3643'; // cDai
+const cToken = new web3.eth.Contract(cErcAbi, cTokenAddress);
+const assetName = 'DAI'; // for the log output lines
+const underlyingDecimals = 18; // Number of decimals defined in this ERC20 token's contract
 
 // MyContract
 const myContractAbi = require('../.build/abi.json');
-const myContractAddress = '0x9C5Dd70D98e9B321217e8232235e25E64E78C595';
+const myContractAddress = '0x8dF3b210283F08eC30da4e8fF8bf62981FbBef34';
 const myContract = new web3.eth.Contract(myContractAbi, myContractAddress);
+
+// Web3 transaction information, we'll use this for every transaction we'll send
+const fromMyWallet = {
+  from: myWalletAddress,
+  gasLimit: web3.utils.toHex(500000),
+  gasPrice: web3.utils.toHex(20000000000) // use ethgasstation.info (mainnet only)
+};
 
 const logBalances = () => {
   return new Promise(async (resolve, reject) => {
-    const myWalletDaiBalance = +await dai.methods.balanceOf(myWalletAddress).call() / 1e18;
+    const myWalletUnderlyingBalance = +await underlying.methods.balanceOf(myWalletAddress).call() / 1e18;
     const myContractEthBalance = +web3.utils.fromWei(await web3.eth.getBalance(myContractAddress));
     const myContractCEthBalance = await cEth.methods.balanceOf(myContractAddress).call() / 1e8;
-    const myContractDaiBalance = +await dai.methods.balanceOf(myContractAddress).call() / 1e18;
-    const myContractCDaiBalance = +await cDai.methods.balanceOf(myContractAddress).call() / 1e8;
+    const myContractUnderlyingBalance = +await underlying.methods.balanceOf(myContractAddress).call() / 1e18;
+    const myContractCTokenBalance = +await cToken.methods.balanceOf(myContractAddress).call() / 1e8;
 
-    console.log("My Wallet's   DAI Balance:", myWalletDaiBalance);
-    console.log("MyContract's  ETH Balance:", myContractEthBalance);
-    console.log("MyContract's cETH Balance:", myContractCEthBalance);
-    console.log("MyContract's  DAI Balance:", myContractDaiBalance);
-    console.log("MyContract's cDAI Balance:", myContractCDaiBalance);
+    console.log(`My Wallet's   ${assetName} Balance:`, myWalletUnderlyingBalance);
+    console.log(`MyContract's  ETH Balance:`, myContractEthBalance);
+    console.log(`MyContract's cETH Balance:`, myContractCEthBalance);
+    console.log(`MyContract's  ${assetName} Balance:`, myContractUnderlyingBalance);
+    console.log(`MyContract's c${assetName} Balance:`, myContractCTokenBalance);
 
     resolve();
   });
@@ -59,47 +66,42 @@ const logBalances = () => {
 const main = async () => {
   await logBalances();
 
-  const daiToSupplyAsCollateral = '15';
-  const daiMantissa = web3.utils.toWei(daiToSupplyAsCollateral, 'ether');
-  console.log(`\nSending ${daiToSupplyAsCollateral} DAI to MyContract so it can provide collateral...\n`);
+  const underlyingAsCollateral = 30;
+  const mantissa = (underlyingAsCollateral * Math.pow(10, underlyingDecimals)).toString();
+  console.log(`\nSending ${underlyingAsCollateral} ${assetName} to MyContract so it can provide collateral...\n`);
 
-  // Send DAI to MyContract before attempting the supply
-  await dai.methods.transfer(myContractAddress, daiMantissa).send({
-    from: myWalletAddress,
-    gasLimit: web3.utils.toHex(5000000),      // posted at compound.finance/developers#gas-costs
-    gasPrice: web3.utils.toHex(20000000000), // use ethgasstation.info (mainnet only)
-  });
+  // Send underlying to MyContract before attempting the supply
+  await underlying.methods.transfer(myContractAddress, mantissa).send(fromMyWallet);
 
   await logBalances();
 
-  console.log(`\nCalling MyContract.borrowEthExample with ${daiToSupplyAsCollateral} DAI for collateral...\n`);
+  console.log(`\nCalling MyContract.borrowEthExample with ${underlyingAsCollateral} ${assetName} as collateral...\n`);
+
+console.log('cEthAddress', cEthAddress)
+console.log('comptrollerAddress',     comptrollerAddress)
+console.log('cTokenAddress',     cTokenAddress)
+console.log('underlyingAddress',     underlyingAddress)
+console.log('mantissa',      mantissa)
+
   let result = await myContract.methods.borrowEthExample(
     cEthAddress,
     comptrollerAddress,
-    cDaiAddress,
-    daiAddress,
-    daiMantissa
-  ).send({
-    from: myWalletAddress,
-    gasLimit: web3.utils.toHex(6000000),     // posted at compound.finance/developers#gas-costs
-    gasPrice: web3.utils.toHex(20000000000), // use ethgasstation.info (mainnet only)
-  });
+    cTokenAddress,
+    underlyingAddress,
+    mantissa
+  ).send(fromMyWallet);
 
   // See the solidity functions logs from "MyLog" event
-  // console.log(result.events.MyLog);
+  console.log(JSON.stringify(result), '\n');
 
   await logBalances();
 
   console.log(`\nNow repaying the borrow...\n`);
   const ethToRepayBorrow = 0.02;
   result = await myContract.methods.myEthRepayBorrow(
-      cEthAddress,
-      web3.utils.toWei(ethToRepayBorrow.toString(), 'ether')
-    ).send({
-    from: myWalletAddress,
-    gasLimit: web3.utils.toHex(5000000),      // posted at compound.finance/developers#gas-costs
-    gasPrice: web3.utils.toHex(20000000000), // use ethgasstation.info (mainnet only)
-  });
+    cEthAddress,
+    web3.utils.toWei(ethToRepayBorrow.toString(), 'ether')
+  ).send(fromMyWallet);
 
   await logBalances();
 };

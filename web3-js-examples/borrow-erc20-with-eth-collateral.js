@@ -3,9 +3,7 @@ const Web3 = require('web3');
 const web3 = new Web3('http://127.0.0.1:8545');
 const {
   cEthAbi,
-  comptrollerAddress,
   comptrollerAbi,
-  priceFeedAddress,
   priceFeedAbi,
   cErcAbi,
   erc20Abi,
@@ -23,14 +21,16 @@ const cEthAddress = '0x4ddc2d193948926d02f9b1fe9e1daa0718270ed5';
 const cEth = new web3.eth.Contract(cEthAbi, cEthAddress);
 
 // Mainnet Contract for the Compound Protocol's Comptroller
+const comptrollerAddress = '0x3d9819210a31b4961b30ef54be2aed79b9c9cd3b';
 const comptroller = new web3.eth.Contract(comptrollerAbi, comptrollerAddress);
 
 // Mainnet Contract for the Open Price Feed
+const priceFeedAddress = '0x922018674c12a7f0d394ebeef9b58f186cde13c1';
 const priceFeed = new web3.eth.Contract(priceFeedAbi, priceFeedAddress);
 
 // Mainnet address of underlying token (like DAI or USDC)
-const underylingAddress = '0x6B175474E89094C44Da98b954EedeAC495271d0F'; // Dai
-const underlying = new web3.eth.Contract(erc20Abi, underylingAddress);
+const underlyingAddress = '0x6B175474E89094C44Da98b954EedeAC495271d0F'; // Dai
+const underlying = new web3.eth.Contract(erc20Abi, underlyingAddress);
 
 // Mainnet address for a cToken (like cDai, https://compound.finance/docs#networks)
 const cTokenAddress = '0x5d3a536e4d6dbd6114cc1ead35777bab948e3643'; // cDai

@@ -46,24 +46,27 @@ interface Comptroller {
 }
 
 
-interface PriceOracle {
-    function getUnderlyingPrice(address) external view returns (uint256);
+interface PriceFeed {
+    function getUnderlyingPrice(address cToken) external view returns (uint);
 }
 
 
 contract MyContract {
     event MyLog(string, uint256);
 
+    // Seed the contract with a supported underyling asset before running this
+    // `node seed-account-with-erc20/dai.js` then transfer to the contract
     function borrowErc20Example(
         address payable _cEtherAddress,
         address _comptrollerAddress,
-        address _priceOracleAddress,
-        address _cDaiAddress
+        address _priceFeedAddress,
+        address _cTokenAddress,
+        uint _underlyingDecimals
     ) public payable returns (uint256) {
         CEth cEth = CEth(_cEtherAddress);
         Comptroller comptroller = Comptroller(_comptrollerAddress);
-        PriceOracle priceOracle = PriceOracle(_priceOracleAddress);
-        CErc20 cDai = CErc20(_cDaiAddress);
+        PriceFeed priceFeed = PriceFeed(_priceFeedAddress);
+        CErc20 cToken = CErc20(_cTokenAddress);
 
         // Supply ETH as collateral, get cETH in return
         cEth.mint.value(msg.value)();
@@ -92,28 +95,28 @@ contract MyContract {
         // ) = comptroller.markets(_cEthAddress);
         // emit MyLog('ETH Collateral Factor', collateralFactorMantissa);
 
-        // Get the amount of DAI added to your borrow each block
-        // uint borrowRateMantissa = cDai.borrowRatePerBlock();
-        // emit MyLog('Current DAI Borrow Rate', borrowRateMantissa);
+        // Get the amount of underlying added to your borrow each block
+        // uint borrowRateMantissa = cToken.borrowRatePerBlock();
+        // emit MyLog('Current Borrow Rate', borrowRateMantissa);
 
-        // Get the DAI price in ETH from the Price Oracle,
-        // so we can find out the maximum amount of DAI we can borrow.
-        uint256 daiPriceInWei = priceOracle.getUnderlyingPrice(_cDaiAddress);
-        uint256 maxBorrowDaiInWei = liquidity / daiPriceInWei;
+        // Get the underlying price in USD from the Price Feed,
+        // so we can find out the maximum amount of underlying we can borrow.
+        uint256 underlyingPrice = priceFeed.getUnderlyingPrice(_cTokenAddress);
+        uint256 maxBorrowUnderlying = liquidity / underlyingPrice;
 
         // Borrowing near the max amount will result
         // in your account being liquidated instantly
-        emit MyLog("Maximum DAI Borrow (borrow far less!)", maxBorrowDaiInWei);
+        emit MyLog("Maximum underlying Borrow (borrow far less!)", maxBorrowUnderlying);
 
-        // Borrow DAI
-        uint256 numDaiToBorrow = 10;
+        // Borrow underlying
+        uint256 numUnderlyingToBorrow = 10;
 
-        // Borrow DAI, check the DAI balance for this contract's address
-        cDai.borrow(numDaiToBorrow * 1e18);
+        // Borrow, check the underlying balance for this contract's address
+        cToken.borrow(numUnderlyingToBorrow * 10**_underlyingDecimals);
 
         // Get the borrow balance
-        uint256 borrows = cDai.borrowBalanceCurrent(address(this));
-        emit MyLog("Current DAI borrow amount", borrows);
+        uint256 borrows = cToken.borrowBalanceCurrent(address(this));
+        emit MyLog("Current underlying borrow amount", borrows);
 
         return borrows;
     }
@@ -132,11 +135,11 @@ contract MyContract {
         address _cErc20Address,
         uint256 amount
     ) public returns (bool) {
-        Erc20 dai = Erc20(_erc20Address);
-        CErc20 cDai = CErc20(_cErc20Address);
+        Erc20 underlying = Erc20(_erc20Address);
+        CErc20 cToken = CErc20(_cErc20Address);
 
-        dai.approve(_cErc20Address, amount);
-        uint256 error = cDai.repayBorrow(amount);
+        underlying.approve(_cErc20Address, amount);
+        uint256 error = cToken.repayBorrow(amount);
 
         require(error == 0, "CErc20.repayBorrow Error");
         return true;
@@ -145,25 +148,25 @@ contract MyContract {
     function borrowEthExample(
         address payable _cEtherAddress,
         address _comptrollerAddress,
-        address _cDaiAddress,
-        address _daiAddress,
-        uint256 _daiToSupplyAsCollateral
+        address _cTokenAddress,
+        address _underlyingAddress,
+        uint256 _underlyingToSupplyAsCollateral
     ) public returns (uint) {
         CEth cEth = CEth(_cEtherAddress);
         Comptroller comptroller = Comptroller(_comptrollerAddress);
-        CErc20 cDai = CErc20(_cDaiAddress);
-        Erc20 dai = Erc20(_daiAddress);
+        CErc20 cToken = CErc20(_cTokenAddress);
+        Erc20 underlying = Erc20(_underlyingAddress);
 
-        // Approve transfer of DAI
-        dai.approve(_cDaiAddress, _daiToSupplyAsCollateral);
+        // Approve transfer of underlying
+        underlying.approve(_cTokenAddress, _underlyingToSupplyAsCollateral);
 
-        // Supply DAI as collateral, get cDAI in return
-        uint256 error = cDai.mint(_daiToSupplyAsCollateral);
+        // Supply underlying as collateral, get cToken in return
+        uint256 error = cToken.mint(_underlyingToSupplyAsCollateral);
         require(error == 0, "CErc20.mint Error");
 
-        // Enter the DAI market so you can borrow another type of asset
+        // Enter the market so you can borrow another type of asset
         address[] memory cTokens = new address[](1);
-        cTokens[0] = _cDaiAddress;
+        cTokens[0] = _cTokenAddress;
         uint256[] memory errors = comptroller.enterMarkets(cTokens);
         if (errors[0] != 0) {
             revert("Comptroller.enterMarkets failed.");
@@ -186,8 +189,8 @@ contract MyContract {
         // (
         //   bool isListed,
         //   uint collateralFactorMantissa
-        // ) = comptroller.markets(_cDaiAddress);
-        // emit MyLog('DAI Collateral Factor', collateralFactorMantissa);
+        // ) = comptroller.markets(_cTokenAddress);
+        // emit MyLog('Collateral Factor', collateralFactorMantissa);
 
         // Get the amount of ETH added to your borrow each block
         // uint borrowRateMantissa = cEth.borrowRatePerBlock();
@@ -196,7 +199,7 @@ contract MyContract {
         // Borrow a fixed amount of ETH below our maximum borrow amount
         uint256 numWeiToBorrow = 20000000000000000; // 0.02 ETH
 
-        // Borrow DAI, check the DAI balance for this contract's address
+        // Borrow, then check the underlying balance for this contract's address
         cEth.borrow(numWeiToBorrow);
 
         uint256 borrows = cEth.borrowBalanceCurrent(address(this));
