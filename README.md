@@ -25,6 +25,11 @@ cd compound-borrow-examples/
 npm install
 ```
 
+We'll need `npx` for this project. If you don't have `npx`, install it using this command:
+```bash
+npm install -g npx
+```
+
 If you want to use the script examples in the **web browser**, you'll need to first import web3.js in your HTML file using the following line. You'll also need to import the JS example files into your HTML. This step is **not necessary** if you are running the examples with only Node.js.
 ```html
 <script src="https://cdn.jsdelivr.net/npm/web3@1.2.6/dist/web3.min.js"></script>
@@ -36,10 +41,10 @@ To get the localhost test net running, use the following commands in a second co
 **If you are not running your own Ethereum node, make an [Infura](https://infura.io/) account at [https://infura.io/](https://infura.io/).** Accounts are free. Get a **project ID** and supplant it into the terminal command below.
 
 ```bash
-cd compound-supply-examples/
+cd compound-borrow-examples/
 
 ## Run a fork of Mainnet locally using Ganache CLI
-ganache-cli \
+npx ganache-cli \
   -f https://mainnet.infura.io/v3/<YOUR INFURA API KEY HERE> \
   -m "clutch captain shoe salt awake harvest setup primary inmate ugly among become" \
   -i 1 \
