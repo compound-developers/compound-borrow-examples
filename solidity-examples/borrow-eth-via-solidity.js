@@ -41,7 +41,7 @@ const myContract = new web3.eth.Contract(myContractAbi, myContractAddress);
 // Web3 transaction information, we'll use this for every transaction we'll send
 const fromMyWallet = {
   from: myWalletAddress,
-  gasLimit: web3.utils.toHex(500000),
+  gasLimit: web3.utils.toHex(6000000),
   gasPrice: web3.utils.toHex(20000000000) // use ethgasstation.info (mainnet only)
 };
 
@@ -66,7 +66,7 @@ const logBalances = () => {
 const main = async () => {
   await logBalances();
 
-  const underlyingAsCollateral = 30;
+  const underlyingAsCollateral = 25;
   const mantissa = (underlyingAsCollateral * Math.pow(10, underlyingDecimals)).toString();
   console.log(`\nSending ${underlyingAsCollateral} ${assetName} to MyContract so it can provide collateral...\n`);
 
@@ -77,12 +77,6 @@ const main = async () => {
 
   console.log(`\nCalling MyContract.borrowEthExample with ${underlyingAsCollateral} ${assetName} as collateral...\n`);
 
-console.log('cEthAddress', cEthAddress)
-console.log('comptrollerAddress',     comptrollerAddress)
-console.log('cTokenAddress',     cTokenAddress)
-console.log('underlyingAddress',     underlyingAddress)
-console.log('mantissa',      mantissa)
-
   let result = await myContract.methods.borrowEthExample(
     cEthAddress,
     comptrollerAddress,
@@ -92,7 +86,7 @@ console.log('mantissa',      mantissa)
   ).send(fromMyWallet);
 
   // See the solidity functions logs from "MyLog" event
-  console.log(JSON.stringify(result), '\n');
+  // console.log(JSON.stringify(result), '\n');
 
   await logBalances();
 
