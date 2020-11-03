@@ -2,6 +2,8 @@
 
 Examples for borrowing Ethereum assets from the [Compound Protocol](https://compound.finance/?ref=github&user=ajb413&repo=compound-borrow-examples).
 
+**[Full Quick Start Tutorial on the Compound Medium Blog](https://medium.com/compound-finance/borrowing-assets-from-compound-quick-start-guide-f5e69af4b8f4)** 
+
 If you want to borrow assets directly from the protocol from your Ethereum wallet using JSON RPC and Web3.js, see the `web3-js-examples` folder. JSON RPC can be utilized in the **web browser or with Node.js**.
 
 If you want to borrow assets from the protocol from your Ethereum smart contract, see the `solidity-examples` folder.
