@@ -59,22 +59,20 @@ npx ganache-cli \
 ## Borrowing Assets Directly via Web3 JSON RPC
 These code examples can be run by a web browser or with Node.js. If you want to use a web browser, you'll need to import the web3.js script in your HTML or JS file (see import above).
 
-Running these scripts will give your wallet borrowed **ETH** and **DAI**. cTokens are ERC20 Tokens that can be **used to redeem an ever-increasing amount of the underlying asset**. The cToken exchange rate **increases every Ethereum block**, they can be transferred, and can be used to redeem at any time, as long as it does not put your borrowing account under water.
+Running these scripts will give your wallet borrowed **ETH** and **Dai**. cTokens are ERC20 Tokens that can be **used to redeem an ever-increasing amount of the underlying asset**. The cToken exchange rate **increases every Ethereum block**, they can be transferred, and can be used to redeem at any time, as long as the underlying collateral does not support an open borrow.
 
 ### Localhost Test Net
 - Run your local testnet in a second command line window **using the command above**.
-- If supplying DAI (an ERC20 token example) as collateral, you need to **first** mint some for your wallet using `node seed-account-with-erc20/dai.js`. You may need to update the DAI main net contract address and the `MCD_JOIN_DAI` address in the script. This changes periodically as DAI is improved (see **Minting Localhost Test DAI** section below for updating).
-- `node compile-smart-contracts.js` This will compile the Solidity code in `solidity-examples/`. The build output is written to `.build/`
-- `node deploy-smart-contracts.js`
-- `cd solidity-examples/`
-- `node borrow-erc20-with-eth-collateral.js` To borrow DAI with ETH.
-- `node borrow-eth-with-erc20-collateral.js` To borrow ETH with DAI.
+- If supplying Dai (an ERC20 token example) as collateral, you need to **first** seed some in your wallet using `node seed-account-with-erc20/dai.js`. You may need to update the Dai mainnet contract address and the `MCD_JOIN_DAI` address in the script. This changes periodically as Dai is improved (see **Minting Localhost Test DAI** section below for updating).
+- `cd web3-js-examples/`
+- `node borrow-erc20-with-eth-collateral.js` To borrow Dai with ETH collateral.
+- `node borrow-eth-with-erc20-collateral.js` To borrow ETH with Dai collateral.
 
 ### Public Test Net or Main Net
 - Make sure you have a wallet with ETH for the Ethereum network you plan to interface with (Main, Ropsten, Kovan, etc.).
 - Insert the private key of your wallet in the scripts where noted. It's a best practice to insert the private key using an environment variable instead of revealing it in the code with a string literal.
-- Replace the HTTP provider in the `web3` constructors in the JS scripts in `solidity-examples/`. Replace it using the string provided by the "Endpoint" selector in your Infura project dashboard. The local test net provider is `http://127.0.0.1:8545`.
-- Next, replace the contract addresses in the JSON file with the most recent ones. You can find Compound's cToken contract addresses for each network on this page: [https://compound.finance/developers#networks](https://compound.finance/developers#networks). The DAI contract address can be found in the Maker DAO website change logs [https://changelog.makerdao.com/](https://changelog.makerdao.com/).
+- Replace the HTTP provider in the `web3` constructors in the JS scripts in `web3-js-examples/`. Replace it using the string provided by the "Endpoint" selector in your Infura project dashboard. The localhost test net provider is `http://127.0.0.1:8545`.
+- Next, replace the contract addresses in the JSON file with the most recent ones. You can find Compound's cToken contract addresses for each network on this page: [https://compound.finance/docs#networks](https://compound.finance/docs#networks). The DAI contract address can be found in the Maker DAO website change logs [https://changelog.makerdao.com/](https://changelog.makerdao.com/).
 
 ## Output Examples
 
