@@ -3,16 +3,9 @@
 const Web3 = require('web3');
 const web3 = new Web3('http://127.0.0.1:8545');
 const {
-  cEthAddress,
   cEthAbi,
-  comptrollerAddress,
-  comptrollerAbi,
-  priceOracleAddress,
-  priceOracleAbi,
-  daiAddress,
-  daiAbi,
-  cDaiAddress,
-  cDaiAbi
+  cErcAbi,
+  erc20Abi,
 } = require('../contracts.json');
 
 // Your Ethereum wallet private key
@@ -22,16 +15,27 @@ const privateKey = 'b8c1b5c1d81f9475fdf2e334517d29f733bdfa40682207571b12fc1142cb
 web3.eth.accounts.wallet.add('0x' + privateKey);
 const myWalletAddress = web3.eth.accounts.wallet[0].address;
 
-// Main Net Contract for cETH (the collateral-supply process is different for cERC20 tokens)
+// Mainnet Contract for cETH (the collateral-supply process is different for cERC20 tokens)
+const cEthAddress = '0x4ddc2d193948926d02f9b1fe9e1daa0718270ed5';
 const cEth = new web3.eth.Contract(cEthAbi, cEthAddress);
 
-// Main net address of DAI contract
-// https://etherscan.io/address/0x6b175474e89094c44da98b954eedeac495271d0f
-const dai = new web3.eth.Contract(daiAbi, daiAddress);
+// Mainnet Contract for the Comptroller & Open Price Feed
+const comptrollerAddress = '0x3d9819210a31b4961b30ef54be2aed79b9c9cd3b';
+const priceFeedAddress = '0x922018674c12a7f0d394ebeef9b58f186cde13c1';
+
+// Mainnet address of underlying token (like DAI or USDC)
+const underlyingAddress = '0x6B175474E89094C44Da98b954EedeAC495271d0F'; // Dai
+const underlying = new web3.eth.Contract(erc20Abi, underlyingAddress);
+
+// Mainnet address for a cToken (like cDai, https://compound.finance/docs#networks)
+const cTokenAddress = '0x5d3a536e4d6dbd6114cc1ead35777bab948e3643'; // cDai
+const cToken = new web3.eth.Contract(cErcAbi, cTokenAddress);
+const assetName = 'DAI'; // for the log output lines
+const underlyingDecimals = 18; // Number of decimals defined in this ERC20 token's contract
 
 // MyContract
 const myContractAbi = require('../.build/abi.json');
-const myContractAddress = '0x9C5Dd70D98e9B321217e8232235e25E64E78C595';
+const myContractAddress = '0x8dF3b210283F08eC30da4e8fF8bf62981FbBef34';
 const myContract = new web3.eth.Contract(myContractAbi, myContractAddress);
 
 const logBalances = () => {
@@ -39,12 +43,12 @@ const logBalances = () => {
     let myWalletEthBalance = +web3.utils.fromWei(await web3.eth.getBalance(myWalletAddress));
     let myContractEthBalance = +web3.utils.fromWei(await web3.eth.getBalance(myContractAddress));
     let myContractCEthBalance = await cEth.methods.balanceOf(myContractAddress).call() / 1e8;
-    let myContractDaiBalance = +await dai.methods.balanceOf(myContractAddress).call() / 1e18;
+    let myContractUnderlyingBalance = +await underlying.methods.balanceOf(myContractAddress).call() / Math.pow(10, underlyingDecimals);
 
     console.log("My Wallet's   ETH Balance:", myWalletEthBalance);
     console.log("MyContract's  ETH Balance:", myContractEthBalance);
     console.log("MyContract's cETH Balance:", myContractCEthBalance);
-    console.log("MyContract's  DAI Balance:", myContractDaiBalance);
+    console.log(`MyContract's  ${assetName} Balance:`, myContractUnderlyingBalance);
 
     resolve();
   });
@@ -53,19 +57,20 @@ const logBalances = () => {
 const main = async () => {
   await logBalances();
 
-  const ethToSupplyAsCollateral = '1';
+  const ethToSupplyAsCollateral = 1;
 
   console.log(`\nCalling MyContract.borrowErc20Example with ${ethToSupplyAsCollateral} ETH for collateral...\n`);
   let result = await myContract.methods.borrowErc20Example(
       cEthAddress,
       comptrollerAddress,
-      priceOracleAddress,
-      cDaiAddress
+      priceFeedAddress,
+      cTokenAddress,
+      underlyingDecimals
     ).send({
     from: myWalletAddress,
-    gasLimit: web3.utils.toHex(5000000),      // posted at compound.finance/developers#gas-costs
+    gasLimit: web3.utils.toHex(5000000),
     gasPrice: web3.utils.toHex(20000000000), // use ethgasstation.info (mainnet only)
-    value: web3.utils.toHex(web3.utils.toWei(ethToSupplyAsCollateral, 'ether'))
+    value: (ethToSupplyAsCollateral * 1e18).toString()
   });
 
   // See the solidity functions logs from "MyLog" event
@@ -74,14 +79,14 @@ const main = async () => {
   await logBalances();
 
   console.log(`\nNow repaying the borrow...\n`);
-  const daiToRepayBorrow = 10;
+  const underlyingToRepayBorrow = 10;
   result = await myContract.methods.myErc20RepayBorrow(
-      daiAddress,
-      cDaiAddress,
-      web3.utils.toWei(daiToRepayBorrow.toString(), 'ether')
+      underlyingAddress,
+      cTokenAddress,
+      (underlyingToRepayBorrow * Math.pow(10, underlyingDecimals)).toString()
     ).send({
     from: myWalletAddress,
-    gasLimit: web3.utils.toHex(5000000),      // posted at compound.finance/developers#gas-costs
+    gasLimit: web3.utils.toHex(5000000),
     gasPrice: web3.utils.toHex(20000000000), // use ethgasstation.info (mainnet only)
   });
 
