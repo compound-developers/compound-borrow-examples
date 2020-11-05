@@ -121,15 +121,6 @@ contract MyContract {
         return borrows;
     }
 
-    function myEthRepayBorrow(address _cEtherAddress, uint256 amount)
-        public
-        returns (bool)
-    {
-        CEth cEth = CEth(_cEtherAddress);
-        cEth.repayBorrow.value(amount)();
-        return true;
-    }
-
     function myErc20RepayBorrow(
         address _erc20Address,
         address _cErc20Address,
@@ -185,14 +176,14 @@ contract MyContract {
         // in your account being liquidated instantly
         emit MyLog("Maximum ETH Borrow (borrow far less!)", liquidity);
 
-        // Get the collateral factor for our collateral
+        // // Get the collateral factor for our collateral
         // (
         //   bool isListed,
         //   uint collateralFactorMantissa
         // ) = comptroller.markets(_cTokenAddress);
         // emit MyLog('Collateral Factor', collateralFactorMantissa);
 
-        // Get the amount of ETH added to your borrow each block
+        // // Get the amount of ETH added to your borrow each block
         // uint borrowRateMantissa = cEth.borrowRatePerBlock();
         // emit MyLog('Current ETH Borrow Rate', borrowRateMantissa);
 
@@ -206,6 +197,15 @@ contract MyContract {
         emit MyLog("Current ETH borrow amount", borrows);
 
         return borrows;
+    }
+
+    function myEthRepayBorrow(address _cEtherAddress, uint256 amount)
+        public
+        returns (bool)
+    {
+        CEth cEth = CEth(_cEtherAddress);
+        cEth.repayBorrow.value(amount)();
+        return true;
     }
 
     // Need this to receive ETH when `borrowEthExample` executes
