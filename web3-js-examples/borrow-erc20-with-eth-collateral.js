@@ -45,8 +45,7 @@ const fromMyWallet = {
   gasPrice: web3.utils.toHex(20000000000) // use ethgasstation.info (mainnet only)
 };
 
-const logBalances = () => {
-  return new Promise(async (resolve, reject) => {
+const logBalances = async() => {
     let myWalletEthBalance = +web3.utils.fromWei(await web3.eth.getBalance(myWalletAddress));
     let myWalletCEthBalance = await cEth.methods.balanceOf(myWalletAddress).call() / 1e8;
     let myWalletUnderlyingBalance = +await underlying.methods.balanceOf(myWalletAddress).call() / Math.pow(10, underlyingDecimals);
@@ -54,9 +53,6 @@ const logBalances = () => {
     console.log("My Wallet's  ETH Balance:", myWalletEthBalance);
     console.log("My Wallet's cETH Balance:", myWalletCEthBalance);
     console.log(`My Wallet's  ${assetName} Balance:`, myWalletUnderlyingBalance);
-
-    resolve();
-  });
 };
 
 const main = async () => {
