@@ -54,9 +54,9 @@ const gasPriceLimitForInvestmentRound: number = 279000001459
 setInterval(async () => {
   if (await isAnInvestmentRoundReasonable(gasPriceLimitForInvestmentRound)) {
     console.log("starting an investmentround.");
-    // await borrowDAIFromCompound(1000); 
-    // await swapDAIToETH();
-    // await depositEtherToCompound(1);
+    await borrowDAIFromCompound(1000); 
+    await swapDAIToETH();
+    await depositEtherToCompound(1);
   } else {
     console.log("At the moment it does not make sense to trigger another investment round.");
   }
@@ -168,7 +168,7 @@ async function swapDAIToETH(): Promise<void> {
     deadline
   )
 
-  console.log(tx.hash)
+  console.log(`Check your swap transaction at https://etherscan.io/tx/${tx.hash}`)
 }
 
 
