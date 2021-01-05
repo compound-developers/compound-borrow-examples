@@ -11,7 +11,7 @@ import {
 } from "@uniswap/sdk";
 import { ethers } from "ethers";
 import { uniswapJSONInterface } from "./constants/uniswap-json-interface";
-
+const axios = require('axios')
 const Web3 = require('web3');
 const web3 = new Web3(new Web3.providers.HttpProvider(`https://mainnet.infura.io/v3/${process.env.INFURA_PROJECT_ID}`));
 
@@ -28,7 +28,7 @@ web3.eth.accounts.wallet.add('0x' + process.env.PRIVATE_KEY);
 const myWalletAddress = web3.eth.accounts.wallet[0].address;
 
 const cEthAddress = '0x4ddc2d193948926d02f9b1fe9e1daa0718270ed5';
-const cEth = new web3.eth.Contract(cEthAbi, cEthAddress);
+const cEthContract = new web3.eth.Contract(cEthAbi, cEthAddress);
 
 const comptrollerAddress = '0x3d9819210a31b4961b30ef54be2aed79b9c9cd3b';
 const comptroller = new web3.eth.Contract(comptrollerAbi, comptrollerAddress);
@@ -44,24 +44,23 @@ const assetName = 'DAI';
 const underlyingDecimals = 18;
 
 
-
-
-// Let the automated investment games begin
 ensureEnvironmentIsReasonablyConfigured();
 
-const gasPriceLimitForInvestmentRound: number = 279000001459
+const gasPriceLimitForInvestmentRound: number = 165000000000 // could be flexibilized
+let amountOfDaiToBeBorrowedInThisRound: number = 0 // initialization
+let freeValueInETH: number = 0 // initialization
+
 
 setInterval(async () => {
   if (await isAnInvestmentRoundReasonable(gasPriceLimitForInvestmentRound)) {
     console.log("starting an investmentround.");
-    await borrowDAIFromCompound(1000); 
+    await borrowDAIFromCompound(amountOfDaiToBeBorrowedInThisRound); 
     await swapDAIToETH();
-    await depositEtherToCompound(1);
+    await depositEtherToCompound(freeValueInETH * 0.7); // times 0.7 ensuring there stays ETH for gas in wallet
   } else {
     console.log("At the moment it does not make sense to trigger another investment round.");
   }
 }, 1000 * 60 * Number(process.env.CHECK_EACH_X_MINUTES));
-
 
 
 function ensureEnvironmentIsReasonablyConfigured(): void {
@@ -71,7 +70,6 @@ function ensureEnvironmentIsReasonablyConfigured(): void {
   } else {
     console.log(`optimizing crypto investments for wallet: ${process.env.ACCOUNT} on a regular basis`);
   }
-
 };
 
 
@@ -80,16 +78,44 @@ async function isAnInvestmentRoundReasonable(gasPriceLimitForInvestmentRound: nu
 
   const gasPrice = await web3.eth.getGasPrice()
 
-  if (gasPrice <= gasPriceLimitForInvestmentRound) {
-    console.log(`The gas price ${gasPrice} is fine as your limit is set to ${gasPriceLimitForInvestmentRound}.`)
-    return true
-  } else {
+  const apiResult = (await axios.get(`https://api.compound.finance/api/v2/account?addresses[]=${process.env.ACCOUNT}`)).data
+  const totalCollateralValueInETH = apiResult.accounts[0].total_collateral_value_in_eth.value
+  const totalBorrowValueInETH = apiResult.accounts[0].total_borrow_value_in_eth.value
+  const healthFactor = apiResult.accounts[0].health.value
+
+  freeValueInETH = (totalCollateralValueInETH * 0.8) - totalBorrowValueInETH
+
+  if (gasPrice > gasPriceLimitForInvestmentRound) {
     console.log(`The gas Price ${gasPrice} seems too high as your limit is set to ${gasPriceLimitForInvestmentRound}.`)
+
     return false
   }
 
+  if (healthFactor < 1.1) {
+    console.log(`The health factor of ${healthFactor} is below your limit of 2.`)
+
+    return false
+  }
+
+  console.log(`The gas price of ${gasPrice} is fine as your limit is set to ${gasPriceLimitForInvestmentRound}.`)
+  console.log(`The health factor of ${healthFactor} also allows for an additional investment round.`)
+
+  amountOfDaiToBeBorrowedInThisRound = await getAmountOfDAIWhichCanBeBorrowed()
+  console.log(`We could borrow ${amountOfDaiToBeBorrowedInThisRound}.`)
+  
+  return true
 };
 
+async function getAmountOfDAIWhichCanBeBorrowed(): Promise<number> {
+
+  const priceFeedAddress = '0x922018674c12a7f0d394ebeef9b58f186cde13c1';
+  const priceFeed = new web3.eth.Contract(priceFeedAbi, priceFeedAddress);
+  let priceInUsd = (await priceFeed.methods.price('ETH').call()) / 1000000;
+
+  console.log(`According to the price feed address: The price for Ether is about ${priceInUsd} USD.`)
+
+  return freeValueInETH * priceInUsd * 0.9 // the "* 0.9" just ensures we handle the investment carefully
+}
 
 async function borrowDAIFromCompound(amountOfDAIToBeBorrowed: number) {
 
@@ -173,7 +199,7 @@ async function swapDAIToETH(): Promise<void> {
 
 
 async function depositEtherToCompound(amountToBeDeposited: number) {
-  await cEth.methods.mint().send({
+  await cEthContract.methods.mint().send({
     from: myWalletAddress,
     gasLimit: web3.utils.toHex(150000),
     gasPrice: await web3.eth.getGasPrice(),
