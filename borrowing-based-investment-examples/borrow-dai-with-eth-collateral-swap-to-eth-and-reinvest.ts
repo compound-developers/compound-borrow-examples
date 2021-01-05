@@ -47,16 +47,16 @@ const underlyingDecimals = 18;
 ensureEnvironmentIsReasonablyConfigured();
 
 const gasPriceLimitForInvestmentRound: number = 165000000000 // could be flexibilized
-let amountOfDaiToBeBorrowedInThisRound: number = 0 // initialization
+let amountOfDAIToBeBorrowedInThisRound: number = 0 // initialization
 let freeValueInETH: number = 0 // initialization
 
 
 setInterval(async () => {
   if (await isAnInvestmentRoundReasonable(gasPriceLimitForInvestmentRound)) {
     console.log("starting an investmentround.");
-    await borrowDAIFromCompound(amountOfDaiToBeBorrowedInThisRound); 
+    await borrowDAIFromCompound(amountOfDAIToBeBorrowedInThisRound); 
     await swapDAIToETH();
-    await depositEtherToCompound(freeValueInETH * 0.7); // times 0.7 ensuring there stays ETH for gas in wallet
+    await depositETHToCompound(freeValueInETH * 0.7); // times 0.7 ensuring there stays ETH for gas in wallet
   } else {
     console.log("At the moment it does not make sense to trigger another investment round.");
   }
@@ -91,7 +91,7 @@ async function isAnInvestmentRoundReasonable(gasPriceLimitForInvestmentRound: nu
     return false
   }
 
-  if (healthFactor < 1.1) {
+  if (healthFactor < 2) {
     console.log(`The health factor of ${healthFactor} is below your limit of 2.`)
 
     return false
@@ -100,8 +100,8 @@ async function isAnInvestmentRoundReasonable(gasPriceLimitForInvestmentRound: nu
   console.log(`The gas price of ${gasPrice} is fine as your limit is set to ${gasPriceLimitForInvestmentRound}.`)
   console.log(`The health factor of ${healthFactor} also allows for an additional investment round.`)
 
-  amountOfDaiToBeBorrowedInThisRound = await getAmountOfDAIWhichCanBeBorrowed()
-  console.log(`We could borrow ${amountOfDaiToBeBorrowedInThisRound}.`)
+  amountOfDAIToBeBorrowedInThisRound = await getAmountOfDAIWhichCanBeBorrowed()
+  console.log(`We could borrow ${amountOfDAIToBeBorrowedInThisRound}.`)
   
   return true
 };
@@ -198,7 +198,7 @@ async function swapDAIToETH(): Promise<void> {
 }
 
 
-async function depositEtherToCompound(amountToBeDeposited: number) {
+async function depositETHToCompound(amountToBeDeposited: number) {
   await cEthContract.methods.mint().send({
     from: myWalletAddress,
     gasLimit: web3.utils.toHex(150000),
