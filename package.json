@@ -10,6 +10,10 @@
   "author": "Compound Labs, Inc.",
   "license": "MIT",
   "dependencies": {
+    "@uniswap/sdk": "^3.0.3",
+    "axios": "^0.21.1",
+    "dotenv": "^8.2.0",
+    "ethers": "^5.0.24",
     "ganache-cli": "^6.10.1",
     "solc": "0.5.12",
     "web3": "^1.2.11"
