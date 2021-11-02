@@ -19,7 +19,7 @@ const cEth = new ethers.Contract(cEthAddress, cEthAbi, wallet);
 
 // Mainnet Contract for the Comptroller & Open Price Feed
 const comptrollerAddress = '0x3d9819210a31b4961b30ef54be2aed79b9c9cd3b';
-const priceFeedAddress = '0x922018674c12a7f0d394ebeef9b58f186cde13c1';
+const priceFeedAddress = '0x6d2299c48a8dd07a872fdd0f8233924872ad1071';
 
 // Mainnet address of underlying token (like DAI or USDC)
 const underlyingAddress = '0x6B175474E89094C44Da98b954EedeAC495271d0F'; // Dai

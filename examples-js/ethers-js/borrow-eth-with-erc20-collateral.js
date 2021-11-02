@@ -24,7 +24,7 @@ const comptrollerAddress = '0x3d9819210a31b4961b30ef54be2aed79b9c9cd3b';
 const comptroller = new ethers.Contract(comptrollerAddress, comptrollerAbi, wallet);
 
 // Mainnet Contract for the Open Price Feed
-const priceFeedAddress = '0x922018674c12a7f0d394ebeef9b58f186cde13c1';
+const priceFeedAddress = '0x6d2299c48a8dd07a872fdd0f8233924872ad1071';
 const priceFeed = new ethers.Contract(priceFeedAddress, priceFeedAbi, wallet);
 
 // Mainnet address of underlying token (like DAI or USDC)
