@@ -41,8 +41,8 @@ const myContract = new web3.eth.Contract(myContractAbi, myContractAddress);
 // Web3 transaction information, we'll use this for every transaction we'll send
 const fromMyWallet = {
   from: myWalletAddress,
-  gasLimit: web3.utils.toHex(6000000),
-  gasPrice: web3.utils.toHex(20000000000) // use ethgasstation.info (mainnet only)
+  gasLimit: web3.utils.toHex(4000000),
+  gasPrice: web3.utils.toHex(25000000000) // use ethgasstation.info (mainnet only)
 };
 
 const logBalances = () => {
@@ -64,6 +64,12 @@ const logBalances = () => {
 };
 
 const main = async () => {
+  const contractIsDeployed = (await web3.eth.getCode(myContractAddress)) !== '0x';
+
+  if (!contractIsDeployed) {
+    throw Error('MyContract is not deployed! Deploy it by running the deploy script.');
+  }
+
   await logBalances();
 
   const underlyingAsCollateral = 25;
@@ -91,15 +97,14 @@ const main = async () => {
   await logBalances();
 
   console.log(`\nNow repaying the borrow...\n`);
-  const ethToRepayBorrow = 0.02;
+  const ethToRepayBorrow = 0.002; // hard coded borrow in contract
   result = await myContract.methods.myEthRepayBorrow(
     cEthAddress,
-    web3.utils.toWei(ethToRepayBorrow.toString(), 'ether')
+    web3.utils.toWei(ethToRepayBorrow.toString(), 'ether'),
+    300000 // gas for the "cEth.repayBorrow" function
   ).send(fromMyWallet);
 
   await logBalances();
 };
 
-main().catch((err) => {
-  console.error('ERROR:', err);
-});
+main().catch(console.error);
