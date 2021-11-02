@@ -190,7 +190,7 @@ contract MyContract {
         // emit MyLog('Current ETH Borrow Rate', borrowRateMantissa);
 
         // Borrow a fixed amount of ETH below our maximum borrow amount
-        uint256 numWeiToBorrow = 20000000000000000; // 0.02 ETH
+        uint256 numWeiToBorrow = 2000000000000000; // 0.002 ETH
 
         // Borrow, then check the underlying balance for this contract's address
         cEth.borrow(numWeiToBorrow);
@@ -201,12 +201,12 @@ contract MyContract {
         return borrows;
     }
 
-    function myEthRepayBorrow(address _cEtherAddress, uint256 amount)
+    function myEthRepayBorrow(address _cEtherAddress, uint256 amount, uint256 gas)
         public
         returns (bool)
     {
         CEth cEth = CEth(_cEtherAddress);
-        cEth.repayBorrow{ value: amount, gas: 250000 }();
+        cEth.repayBorrow{ value: amount, gas: gas }();
         return true;
     }
 
