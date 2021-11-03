@@ -57,7 +57,6 @@ contract MyContract {
     event MyLog(string, uint256);
 
     // Seed the contract with a supported underyling asset before running this
-    // `node seed-account-with-erc20/dai.js` then transfer to the contract
     function borrowErc20Example(
         address payable _cEtherAddress,
         address _comptrollerAddress,

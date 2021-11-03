@@ -1,6 +1,5 @@
 // Example to supply a supported ERC20 token as collateral and borrow ETH
 // YOU MUST HAVE DAI IN YOUR WALLET before you run this script
-// To get localhost test net DAI, run `node seed-account-with-erc20/dai.js`
 const Web3 = require('web3');
 const web3 = new Web3('http://127.0.0.1:8545');
 const {
