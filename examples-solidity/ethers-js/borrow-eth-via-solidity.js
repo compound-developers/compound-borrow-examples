@@ -1,6 +1,5 @@
 // Example to supply DAI as collateral and borrow ETH
 // YOU MUST HAVE DAI IN YOUR WALLET before you run this script
-// To get localhost test net DAI, run `mint-testnet-dai.js`
 const ethers = require('ethers');
 const provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
 const {
@@ -91,11 +90,12 @@ const main = async () => {
 
   console.log(`\nNow repaying the borrow...\n`);
   const ethToRepayBorrow = 0.002; // hard coded borrow in contract
-  result = await myContract.myEthRepayBorrow(
+  const repayTx = await myContract.myEthRepayBorrow(
     cEthAddress,
     ethers.utils.parseEther(ethToRepayBorrow.toString()),
     300000 // gas for the "cEth.repayBorrow" function
   );
+  await repayTx.wait(1);
 
   await logBalances();
 };

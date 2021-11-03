@@ -53,6 +53,12 @@ const logBalances = () => {
 };
 
 const main = async () => {
+  const contractIsDeployed = (await provider.getCode(myContractAddress)) !== '0x';
+
+  if (!contractIsDeployed) {
+    throw Error('MyContract is not deployed! Deploy it by running the deploy script.');
+  }
+
   await logBalances();
 
   const ethToSupplyAsCollateral = 1;
