@@ -4,9 +4,12 @@ Examples for borrowing Ethereum assets from the [Compound Protocol](https://comp
 
 **[Full Quick Start Tutorial on the Compound Medium Blog](https://medium.com/compound-finance/borrowing-assets-from-compound-quick-start-guide-f5e69af4b8f4)** 
 
-If you want to borrow assets directly from the protocol from your Ethereum wallet using JSON RPC and Web3.js, see the `web3-js-examples` folder. JSON RPC can be utilized in the **web browser or with Node.js**.
+If you want to borrow assets directly from the protocol from your Ethereum wallet using JSON RPC and Web3.js, see the `examples-js` folder. There are examples for popular web3 libraries like **Web3.js**, **Ethers.js**, and **Compound.js**.
 
-If you want to borrow assets from the protocol from your Ethereum smart contract, see the `solidity-examples` folder.
+JSON RPC can be utilized in the **web browser, with Node.js, or any other programming language with a web3 library**.
+
+If you want to borrow assets from the protocol from your Ethereum smart contract, see the `examples-solidity` folder.
+
 
 ## What is Compound?
 Compound is an open-source, autonomous protocol built for developers, to unlock a universe of new financial applications. Interest and borrowing, for the open financial system. Learn more on the website:
@@ -16,7 +19,7 @@ Compound is an open-source, autonomous protocol built for developers, to unlock 
 </a>
 
 ## Setup
-The code in this repository can be used to borrow assets from Compound on the Ethereum mainnet, any public test net, or your own localhost with [Ganache CLI](https://github.com/trufflesuite/ganache-cli).
+The code in this repository can be used to borrow assets from Compound on the Ethereum mainnet, any public test net, or your own localhost with [Hardhat](https://hardhat.org/getting-started/).
 
 If you haven't already, install [Node.js](https://nodejs.org/) LTS. Clone this repository, `cd` to the root directory of the project, and run:
 ```bash
@@ -30,49 +33,55 @@ We'll need `npx` for this project. If you don't have `npx`, install it using thi
 npm install -g npx
 ```
 
-If you want to use the script examples in the **web browser**, you'll need to first import web3.js in your HTML file using the following line. You'll also need to import the JS example files into your HTML. This step is **not necessary** if you are running the examples with only Node.js.
-```html
-<script src="https://cdn.jsdelivr.net/npm/web3@1.2.6/dist/web3.min.js"></script>
-```
+If you want to use the JS examples in the **web browser**, you'll need to first import your web3 library of choice into your HTML (Web3.js, Ethers.js, or Compound.js). This step is **not necessary** if you are running the examples with only Node.js.
 
-### Running a Local Ethereum Test Net with Ganache CLI
-To get the localhost test net running, use the following commands in a second command line window. The command runs Ganache CLI and forks the Main Ethereum network to your machine.
+### Running a Local Ethereum Testnet with Hardhat
+To get the localhost testnet running, use the following commands in a second command line window. The command runs a local Hardhat node and forks Ethereum Mainnet to your machine.
 
-**If you are not running your own Ethereum node, make an [Infura](https://infura.io/) account at [https://infura.io/](https://infura.io/).** Accounts are free. Get a **project ID** and supplant it into the terminal command below.
+**If you are not running your own Ethereum node, make an [Infura](https://infura.io/) account at [https://infura.io/](https://infura.io/) or at [Alchemy.com](https://alchemy.com).** Accounts are free. Get a **project ID** and supplant it into your [environment variable settings](https://www.twilio.com/blog/2017/01/how-to-set-environment-variables.html), like below.
 
 ```bash
-cd compound-borrow-examples/
+cd compound-supply-examples/
 
-## Run a fork of Mainnet locally using Ganache CLI
-npx ganache-cli \
-  -f https://mainnet.infura.io/v3/<YOUR INFURA API KEY HERE> \
-  -m "clutch captain shoe salt awake harvest setup primary inmate ugly among become" \
-  -i 1 \
-  -u 0x9759A6Ac90977b93B58547b4A71c78317f391A28
+## Set environment variables for the script to use
+export MAINNET_PROVIDER_URL="https://mainnet.infura.io/v3/<YOUR INFURA API KEY HERE>"
+export DEV_ETH_MNEMONIC="clutch captain shoe salt awake harvest setup primary inmate ugly among become"
+
+## Runs the Hardhat node locally
+## Also seeds your first mnemonic account with test Ether and ERC20s
+node ./scripts/run-localhost-fork.js
 ```
 
-- `-f` Forks the Main Ethereum network to your local machine for development and testing.
-- `-m` Runs Ganache with an Ethereum key set based on the mnemonic passed. The first 10 addresses have 100 test ETH in their balance on the local test net every time you boot Ganache. **Do not use this mnemonic anywhere other than your localhost test net.**
-- `-i` Sets an explicit network ID to avoid confusion and errors.
-- `-u` Unlocks an address so you can write to your localhost test blockchain without knowing that address's private key. We are unlocking the above address so we can mint our own test DAI on our localhost test net. The address for minting DAI changes occasionally (see **Minting Localhost Test DAI** section below for updating).
-
 ## Borrowing Assets Directly via Web3 JSON RPC
-These code examples can be run by a web browser or with Node.js. If you want to use a web browser, you'll need to import the web3.js script in your HTML or JS file (see import above).
+These code examples can be run by a web browser or with Node.js. If you want to use a web browser, you'll need to import a library in your HTML or JS file.
 
 Running these scripts will give your wallet borrowed **ETH** and **Dai**. cTokens are ERC20 Tokens that can be **used to redeem an ever-increasing amount of the underlying asset**. The cToken exchange rate **increases every Ethereum block**, they can be transferred, and can be used to redeem at any time, as long as the underlying collateral does not support an open borrow.
 
 ### Localhost Test Net
-- Run your local testnet in a second command line window **using the command above**.
-- If supplying Dai (an ERC20 token example) as collateral, you need to **first** seed some in your wallet using `node seed-account-with-erc20/dai.js`. You may need to update the Dai mainnet contract address and the `MCD_JOIN_DAI` address in the script. This changes periodically as Dai is improved (see **Minting Localhost Test DAI** section below for updating).
-- `cd web3-js-examples/`
-- `node borrow-erc20-with-eth-collateral.js` To borrow Dai with ETH collateral.
-- `node borrow-eth-with-erc20-collateral.js` To borrow ETH with Dai collateral.
+- Run your local testnet in a second command line window **using the command above**. This will seed your account with ERC20 tokens. Look at the script file to find other ERC20 tokens that can be seeded into the account.
+- `node examples-js/web3-js/borrow-erc20-with-eth-collateral.js` To borrow Dai with ETH collateral.
+- `node examples-js/web3-js/borrow-eth-with-erc20-collateral.js` To borrow ETH with Dai collateral.
 
 ### Public Test Net or Main Net
 - Make sure you have a wallet with ETH for the Ethereum network you plan to interface with (Main, Ropsten, Kovan, etc.).
 - Insert the private key of your wallet in the scripts where noted. It's a best practice to insert the private key using an environment variable instead of revealing it in the code with a string literal.
 - Replace the HTTP provider in the `web3` constructors in the JS scripts in `web3-js-examples/`. Replace it using the string provided by the "Endpoint" selector in your Infura project dashboard. The localhost test net provider is `http://127.0.0.1:8545`.
-- Next, replace the contract addresses in the JSON file with the most recent ones. You can find Compound's cToken contract addresses for each network on this page: [https://compound.finance/docs#networks](https://compound.finance/docs#networks). The DAI contract address can be found in the Maker DAO website change logs [https://changelog.makerdao.com/](https://changelog.makerdao.com/).
+- Next, replace the contract addresses in the JSON file with the most recent ones. You can find Compound's cToken contract addresses for each network on this page: [https://compound.finance/docs#networks](https://compound.finance/docs#networks).
+
+## Borrowing Assets With a Solidity Smart Contract
+The examples send ETH or DAI to a smart contract, which then mints cETH or cDAI. The contract also marks the assets as collateral for borrowing. Next other assets can be borrowed from the protocol.
+
+### Localhost Testnet
+- Run your local testnet in a second command line window **using the command above**. This will seed your account with ERC20 tokens. Look at the script file to find other ERC20 tokens that can be seeded into the account.
+- Compile the smart contract in `./contracts/` by running `npx hardhat compile`
+- Next, deploy the smart contract to the localhost blockchain. `npx hardhat run ./scripts/deploy.js --network localhost`
+- Now that the contract is deployed, copy the address that is logged by the deploy script and paste it into the example script, so it knows where to direct its transactions. All JS files in the `examples-solidity` directory have a variable called `myContractAddress` which is where the `MyContract` address should be supplanted.
+- Now you can run any of the following examples to supply via smart contract.
+- `node ./examples-solidity/web3-js/borrow-erc20-via-solidity.js` To supply ETH as collateral and borrow Dai.
+- `node ./examples-solidity/web3-js/borrow-eth-via-solidity.js` To supply Dai as collateral and borrow ETH.
+
+### Public Testnet or Mainnet
+See the Hardhat docs for more information on deploying to public Ethereum networks. https://hardhat.org/guides/deploying.html
 
 ## Output Examples
 
@@ -82,16 +91,17 @@ Running these scripts will give your wallet borrowed **ETH** and **Dai**. cToken
 <p>
 
 ```
-node web3-js-examples/borrow-erc20-with-eth-collateral.js
-My Wallet's  ETH Balance: 100
+node examples-js/web3-js/borrow-erc20-with-eth-collateral.js
+
+My Wallet's  ETH Balance: 10000
 My Wallet's cETH Balance: 0
-My Wallet's  DAI Balance: 0.000200882723749888
+My Wallet's  DAI Balance: 100
 
 Supplying ETH to the protocol as collateral (you will get cETH in return)...
 
-My Wallet's  ETH Balance: 98.9975322
-My Wallet's cETH Balance: 49.9302679
-My Wallet's  DAI Balance: 0.000200882723749888
+My Wallet's  ETH Balance: 9998.999600295
+My Wallet's cETH Balance: 49.86112032
+My Wallet's  DAI Balance: 100
 
 Entering market (via Comptroller contract) for ETH (as collateral)...
 Calculating your liquid assets in the protocol...
@@ -99,19 +109,19 @@ Fetching cETH collateral factor...
 Fetching DAI price from the price feed...
 Fetching borrow rate per block for DAI borrowing...
 
-You have 287.9287499590705 of LIQUID assets (worth of USD) pooled in the protocol.
+You have 3384.441740171433 of LIQUID assets (worth of USD) pooled in the protocol.
 You can borrow up to 75% of your TOTAL collateral supplied to the protocol as DAI.
-1 DAI == 1.009985 USD
-You can borrow up to 285.0822041506265 DAI from the protocol.
+1 DAI == 1.000000 USD
+You can borrow up to 3384.441740171433 DAI from the protocol.
 NEVER borrow near the maximum amount because your account will be instantly liquidated.
 
-Your borrowed amount INCREASES (1.888700297e-8 * borrowed amount) DAI per block.
+Your borrowed amount INCREASES (2.2076358156e-8 * borrowed amount) DAI per block.
 This is based on the current borrow rate.
 
 Now attempting to borrow 50 DAI...
-My Wallet's  ETH Balance: 98.98930958
-My Wallet's cETH Balance: 49.9302679
-My Wallet's  DAI Balance: 50.00020088272375
+My Wallet's  ETH Balance: 9998.998558725
+My Wallet's cETH Balance: 49.86112032
+My Wallet's  DAI Balance: 150
 
 Fetching DAI borrow balance from cDAI contract...
 Borrow balance is 50 DAI
@@ -123,9 +133,9 @@ Approving DAI to be transferred from your wallet to the cDAI contract...
 
 Borrow repaid.
 
-My Wallet's  ETH Balance: 98.98283472
-My Wallet's cETH Balance: 49.9302679
-My Wallet's  DAI Balance: 0.000200882723749888
+My Wallet's  ETH Balance: 9998.99801022
+My Wallet's cETH Balance: 49.86112032
+My Wallet's  DAI Balance: 100
 
 ```
 </p>
@@ -137,18 +147,19 @@ My Wallet's  DAI Balance: 0.000200882723749888
 <p>
 
 ```
-node web3-js-examples/borrow-eth-with-erc20-collateral.js
-My Wallet's  ETH Balance: 98.98283472
+node examples-js/web3-js/borrow-eth-with-erc20-collateral.js
+
+My Wallet's  ETH Balance: 10000
 My Wallet's cDAI Balance: 0
-My Wallet's  DAI Balance: 50.00020088272375
+My Wallet's  DAI Balance: 100
 
 Approving DAI to be transferred from your wallet to the cDAI contract...
 
 Supplying DAI to the protocol as collateral (you will get cDAI in return)...
 
-My Wallet's  ETH Balance: 98.97617056
-My Wallet's cDAI Balance: 723.03067199
-My Wallet's  DAI Balance: 35.00020088272375
+My Wallet's  ETH Balance: 9999.99525988
+My Wallet's cDAI Balance: 691.40915384
+My Wallet's  DAI Balance: 85
 
 Entering market (via Comptroller contract) for ETH (as collateral)...
 Calculating your liquid assets in the protocol...
@@ -156,25 +167,25 @@ Fetching the protocol's DAI collateral factor...
 Fetching DAI price from the price feed...
 Fetching borrow rate per block for ETH borrowing...
 
-You have 299.291079301354028695 of LIQUID assets (worth of USD) pooled in the protocol.
+You have 11.249999999912092756 of LIQUID assets (worth of USD) pooled in the protocol.
 You can borrow up to 75% of your TOTAL assets supplied to the protocol as ETH.
-1 DAI == 1.009985 USD
-You can borrow up to 299.291079301354028695 USD worth of assets from the protocol.
+1 DAI == 1.000000 USD
+You can borrow up to 11.249999999912092756 USD worth of assets from the protocol.
 NEVER borrow near the maximum amount because your account will be instantly liquidated.
 
-Your borrowed amount INCREASES (1.2222654221e-8 * borrowed amount) ETH per block.
+Your borrowed amount INCREASES (1.1208317598e-8 * borrowed amount) ETH per block.
 This is based on the current borrow rate.
 
-Now attempting to borrow 0.02 ETH...
+Now attempting to borrow 0.002 ETH...
 
 ETH borrow successful.
 
-My Wallet's  ETH Balance: 98.99167388
-My Wallet's cDAI Balance: 723.03067199
-My Wallet's  DAI Balance: 35.00020088272375
+My Wallet's  ETH Balance: 9999.98912288
+My Wallet's cDAI Balance: 691.40915384
+My Wallet's  DAI Balance: 85
 
 Fetching your ETH borrow balance from cETH contract...
-Borrow balance is 0.02 ETH
+Borrow balance is 0.002 ETH
 
 This part is when you do something with those borrowed assets!
 
@@ -182,9 +193,9 @@ Now repaying the borrow...
 
 Borrow repaid.
 
-My Wallet's  ETH Balance: 98.96883582
-My Wallet's cDAI Balance: 723.03067199
-My Wallet's  DAI Balance: 35.00020088272375
+My Wallet's  ETH Balance: 9999.98426352
+My Wallet's cDAI Balance: 691.40915384
+My Wallet's  DAI Balance: 85
 
 ```
 </p>
@@ -196,24 +207,25 @@ My Wallet's  DAI Balance: 35.00020088272375
 <p>
 
 ```
-node solidity-examples/borrow-erc20-via-solidity.js
-My Wallet's   ETH Balance: 99.97413128
+node examples-solidity/web3-js/borrow-erc20-via-solidity.js
+
+My Wallet's   ETH Balance: 10000
 MyContract's  ETH Balance: 0
 MyContract's cETH Balance: 0
 MyContract's  DAI Balance: 0
 
 Calling MyContract.borrowErc20Example with 1 ETH for collateral...
 
-My Wallet's   ETH Balance: 98.96193916
+My Wallet's   ETH Balance: 9998.98883272
 MyContract's  ETH Balance: 0
-MyContract's cETH Balance: 49.9302674
+MyContract's cETH Balance: 49.86111985
 MyContract's  DAI Balance: 10
 
 Now repaying the borrow...
 
-My Wallet's   ETH Balance: 98.95618962
+My Wallet's   ETH Balance: 9998.9852758
 MyContract's  ETH Balance: 0
-MyContract's cETH Balance: 49.9302674
+MyContract's cETH Balance: 49.86111985
 MyContract's  DAI Balance: 0
 ```
 </p>
@@ -225,8 +237,8 @@ MyContract's  DAI Balance: 0
 <p>
 
 ```
-node solidity-examples/borrow-eth-via-solidity.js
-My Wallet's   DAI Balance: 50.00020088272375
+node examples-solidity/web3-js/borrow-eth-via-solidity.js
+My Wallet's   DAI Balance: 100
 MyContract's  ETH Balance: 0
 MyContract's cETH Balance: 0
 MyContract's  DAI Balance: 0
@@ -234,7 +246,7 @@ MyContract's cDAI Balance: 0
 
 Sending 25 DAI to MyContract so it can provide collateral...
 
-My Wallet's   DAI Balance: 25.00020088272375
+My Wallet's   DAI Balance: 75
 MyContract's  ETH Balance: 0
 MyContract's cETH Balance: 0
 MyContract's  DAI Balance: 25
@@ -242,37 +254,48 @@ MyContract's cDAI Balance: 0
 
 Calling MyContract.borrowEthExample with 25 DAI as collateral...
 
-My Wallet's   DAI Balance: 25.00020088272375
-MyContract's  ETH Balance: 0.02
+My Wallet's   DAI Balance: 75
+MyContract's  ETH Balance: 0.002
 MyContract's cETH Balance: 0
 MyContract's  DAI Balance: 0
-MyContract's cDAI Balance: 1205.0508796
+MyContract's cDAI Balance: 1152.34787526
 
 Now repaying the borrow...
 
-My Wallet's   DAI Balance: 25.00020088272375
+My Wallet's   DAI Balance: 75
 MyContract's  ETH Balance: 0
 MyContract's cETH Balance: 0
 MyContract's  DAI Balance: 0
-MyContract's cDAI Balance: 1205.0508796
+MyContract's cDAI Balance: 1152.34787526
 
 ```
 </p>
 </details>
 
-## Minting Localhost Test DAI
-To mint some DAI for your localhost test network, you must use the **Join DAI** address. This can be unlocked when running Ganache CLI. You'll need to update the Join DAI address and the contract address each time the DAI contracts are updated. 
+## Minting Localhost Test ERC20s
 
-The contract address can be found at [https://changelog.makerdao.com/](https://changelog.makerdao.com/).
+All assets supported by the Compound protocol can be seeded into the first account when doing localhost testing. See the `amounts` object at the top of the script `./scripts/run-localhost-fork.js`. You can add assets and amounts to this object. When the localhost fork script is run, Hardhat will move tokens from a whale (cToken contract) to the first wallet of your selected mnemonic (in your environment variable). You can then use these assets freely on your localhost fork.
 
-- Click the latest production release.
-- Click contract addresses.
-- The Mainnet DAI contract address is in the JSON value of the `MCD_DAI` key.
-- The Join DAI address is in the `MCD_JOIN_DAI` key.
+## Ethers.js & Compound.js Examples
 
-Once you're certain you have the latest DAI and Join DAI address:
+There are several other code examples for [ethers.js](https://ethers.org/) and [Compound.js](https://github.com/compound-finance/compound-js). These SDKs can be used instead of Web3.js in each instance. Each version of the script does the same operations. To try the other code examples, run the scripts in the other folders.
 
-- Run Ganache CLI using the command above with `-u` and the Join DAI address.
-- Paste the new addresses in `node seed-account-with-erc20/dai.js` and save.
-- Run `node seed-account-with-erc20/dai.js`
-- See the other scripts in the `seed-account-with-erc20` folder and the addresses to unlock in order to seed the wallet with other supported ERC-20s.
+```bash
+## Ethers.js Examples
+node ./examples-solidity/ethers-js/borrow-erc20-via-solidity.js
+node ./examples-solidity/ethers-js/borrow-eth-via-solidity.js
+node ./examples-js/ethers-js/borrow-erc20-with-eth-collateral.js
+node ./examples-js/ethers-js/borrow-eth-with-erc20-collateral.js
+
+## Compound.js Examples
+node ./examples-solidity/compound-js/borrow-erc20-via-solidity.js
+node ./examples-solidity/compound-js/borrow-eth-via-solidity.js
+node ./examples-js/compound-js/borrow-erc20-with-eth-collateral.js
+node ./examples-js/compound-js/borrow-eth-with-erc20-collateral.js
+
+## Web3.js
+node ./examples-solidity/web3-js/borrow-erc20-via-solidity.js
+node ./examples-solidity/web3-js/borrow-eth-via-solidity.js
+node ./examples-js/web3-js/borrow-erc20-with-eth-collateral.js
+node ./examples-js/web3-js/borrow-eth-with-erc20-collateral.js
+```
