@@ -1,6 +1,5 @@
 // Example to supply a supported ERC20 token as collateral and borrow ETH
 // YOU MUST HAVE DAI IN YOUR WALLET before you run this script
-// To get localhost test net DAI, run `node seed-account-with-erc20/dai.js`
 const Web3 = require('web3');
 const web3 = new Web3('http://127.0.0.1:8545');
 const {
@@ -9,7 +8,7 @@ const {
   priceFeedAbi,
   cErcAbi,
   erc20Abi,
-} = require('../contracts.json');
+} = require('../../contracts.json');
 
 // Your Ethereum wallet private key
 const privateKey = 'b8c1b5c1d81f9475fdf2e334517d29f733bdfa40682207571b12fc1142cbf329';
@@ -27,7 +26,7 @@ const comptrollerAddress = '0x3d9819210a31b4961b30ef54be2aed79b9c9cd3b';
 const comptroller = new web3.eth.Contract(comptrollerAbi, comptrollerAddress);
 
 // Mainnet Contract for the Open Price Feed
-const priceFeedAddress = '0x922018674c12a7f0d394ebeef9b58f186cde13c1';
+const priceFeedAddress = '0x6d2299c48a8dd07a872fdd0f8233924872ad1071';
 const priceFeed = new web3.eth.Contract(priceFeedAbi, priceFeedAddress);
 
 // Mainnet address of underlying token (like DAI or USDC)
@@ -112,8 +111,8 @@ const main = async () => {
   console.log(`NEVER borrow near the maximum amount because your account will be instantly liquidated.`);
   console.log(`\nYour borrowed amount INCREASES (${borrowRate} * borrowed amount) ETH per block.\nThis is based on the current borrow rate.`);
 
-  // Let's try to borrow 0.02 ETH (or another amount far below the borrow limit)
-  const ethToBorrow = 0.02;
+  // Let's try to borrow 0.002 ETH (or another amount far below the borrow limit)
+  const ethToBorrow = 0.002;
   console.log(`\nNow attempting to borrow ${ethToBorrow} ETH...`);
   const borrowResult = await cEth.methods.borrow(web3.utils.toWei(ethToBorrow.toString(), 'ether')).send(fromMyWallet);
 

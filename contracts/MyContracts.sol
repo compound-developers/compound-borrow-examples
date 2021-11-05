@@ -1,4 +1,6 @@
-pragma solidity ^0.5.12;
+// SPDX-License-Identifier: MIT
+
+pragma solidity ^0.8.6;
 
 
 interface Erc20 {
@@ -55,7 +57,6 @@ contract MyContract {
     event MyLog(string, uint256);
 
     // Seed the contract with a supported underyling asset before running this
-    // `node seed-account-with-erc20/dai.js` then transfer to the contract
     function borrowErc20Example(
         address payable _cEtherAddress,
         address _comptrollerAddress,
@@ -69,7 +70,7 @@ contract MyContract {
         CErc20 cToken = CErc20(_cTokenAddress);
 
         // Supply ETH as collateral, get cETH in return
-        cEth.mint.value(msg.value)();
+        cEth.mint{ value: msg.value, gas: 250000 }();
 
         // Enter the ETH market so you can borrow another type of asset
         address[] memory cTokens = new address[](1);
@@ -188,7 +189,7 @@ contract MyContract {
         // emit MyLog('Current ETH Borrow Rate', borrowRateMantissa);
 
         // Borrow a fixed amount of ETH below our maximum borrow amount
-        uint256 numWeiToBorrow = 20000000000000000; // 0.02 ETH
+        uint256 numWeiToBorrow = 2000000000000000; // 0.002 ETH
 
         // Borrow, then check the underlying balance for this contract's address
         cEth.borrow(numWeiToBorrow);
@@ -199,15 +200,15 @@ contract MyContract {
         return borrows;
     }
 
-    function myEthRepayBorrow(address _cEtherAddress, uint256 amount)
+    function myEthRepayBorrow(address _cEtherAddress, uint256 amount, uint256 gas)
         public
         returns (bool)
     {
         CEth cEth = CEth(_cEtherAddress);
-        cEth.repayBorrow.value(amount)();
+        cEth.repayBorrow{ value: amount, gas: gas }();
         return true;
     }
 
     // Need this to receive ETH when `borrowEthExample` executes
-    function() external payable {}
+    receive() external payable {}
 }

@@ -6,7 +6,7 @@ const {
   cEthAbi,
   cErcAbi,
   erc20Abi,
-} = require('../contracts.json');
+} = require('../../contracts.json');
 
 // Your Ethereum wallet private key
 const privateKey = 'b8c1b5c1d81f9475fdf2e334517d29f733bdfa40682207571b12fc1142cbf329';
@@ -21,7 +21,7 @@ const cEth = new web3.eth.Contract(cEthAbi, cEthAddress);
 
 // Mainnet Contract for the Comptroller & Open Price Feed
 const comptrollerAddress = '0x3d9819210a31b4961b30ef54be2aed79b9c9cd3b';
-const priceFeedAddress = '0x922018674c12a7f0d394ebeef9b58f186cde13c1';
+const priceFeedAddress = '0x6d2299c48a8dd07a872fdd0f8233924872ad1071';
 
 // Mainnet address of underlying token (like DAI or USDC)
 const underlyingAddress = '0x6B175474E89094C44Da98b954EedeAC495271d0F'; // Dai
@@ -34,8 +34,8 @@ const assetName = 'DAI'; // for the log output lines
 const underlyingDecimals = 18; // Number of decimals defined in this ERC20 token's contract
 
 // MyContract
-const myContractAbi = require('../.build/abi.json');
-const myContractAddress = '0x8dF3b210283F08eC30da4e8fF8bf62981FbBef34';
+const myContractAbi = require('../../artifacts/contracts/MyContracts.sol/MyContract.json').abi;
+const myContractAddress = '0x0Bb909b7c3817F8fB7188e8fbaA2763028956E30';
 const myContract = new web3.eth.Contract(myContractAbi, myContractAddress);
 
 const logBalances = () => {
@@ -55,6 +55,12 @@ const logBalances = () => {
 };
 
 const main = async () => {
+  const contractIsDeployed = (await web3.eth.getCode(myContractAddress)) !== '0x';
+
+  if (!contractIsDeployed) {
+    throw Error('MyContract is not deployed! Deploy it by running the deploy script.');
+  }
+
   await logBalances();
 
   const ethToSupplyAsCollateral = 1;

@@ -1,57 +1,47 @@
 // Example to supply DAI as collateral and borrow ETH
 // YOU MUST HAVE DAI IN YOUR WALLET before you run this script
-// To get localhost test net DAI, run `mint-testnet-dai.js`
-const Web3 = require('web3');
-const web3 = new Web3('http://127.0.0.1:8545');
+const ethers = require('ethers');
+const provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
 const {
   cEthAbi,
   cErcAbi,
   erc20Abi,
-} = require('../contracts.json');
+} = require('../../contracts.json');
 
 // Your Ethereum wallet private key
 const privateKey = 'b8c1b5c1d81f9475fdf2e334517d29f733bdfa40682207571b12fc1142cbf329';
-
-// Add your Ethereum wallet to the Web3 object
-web3.eth.accounts.wallet.add('0x' + privateKey);
-const myWalletAddress = web3.eth.accounts.wallet[0].address;
+const wallet = new ethers.Wallet(privateKey, provider);
+const myWalletAddress = wallet.address;
 
 // Mainnet Contract for the Comptroller
 const comptrollerAddress = '0x3d9819210a31b4961b30ef54be2aed79b9c9cd3b';
 
 // Mainnet Contract for cETH
 const cEthAddress = '0x4ddc2d193948926d02f9b1fe9e1daa0718270ed5';
-const cEth = new web3.eth.Contract(cEthAbi, cEthAddress);
+const cEth = new ethers.Contract(cEthAddress, cEthAbi, wallet);
 
 // Mainnet address of underlying token (like DAI or USDC)
 const underlyingAddress = '0x6b175474e89094c44da98b954eedeac495271d0f'; // Dai
-const underlying = new web3.eth.Contract(erc20Abi, underlyingAddress);
+const underlying = new ethers.Contract(underlyingAddress, erc20Abi, wallet);
 
 // Mainnet address for a cToken (like cDai, https://compound.finance/docs#networks)
 const cTokenAddress = '0x5d3a536e4d6dbd6114cc1ead35777bab948e3643'; // cDai
-const cToken = new web3.eth.Contract(cErcAbi, cTokenAddress);
+const cToken = new ethers.Contract(cTokenAddress, cErcAbi, wallet);
 const assetName = 'DAI'; // for the log output lines
 const underlyingDecimals = 18; // Number of decimals defined in this ERC20 token's contract
 
 // MyContract
-const myContractAbi = require('../.build/abi.json');
-const myContractAddress = '0x8dF3b210283F08eC30da4e8fF8bf62981FbBef34';
-const myContract = new web3.eth.Contract(myContractAbi, myContractAddress);
-
-// Web3 transaction information, we'll use this for every transaction we'll send
-const fromMyWallet = {
-  from: myWalletAddress,
-  gasLimit: web3.utils.toHex(6000000),
-  gasPrice: web3.utils.toHex(20000000000) // use ethgasstation.info (mainnet only)
-};
+const myContractAbi = require('../../artifacts/contracts/MyContracts.sol/MyContract.json').abi;
+const myContractAddress = '0x0Bb909b7c3817F8fB7188e8fbaA2763028956E30';
+const myContract = new ethers.Contract(myContractAddress, myContractAbi, wallet);
 
 const logBalances = () => {
   return new Promise(async (resolve, reject) => {
-    const myWalletUnderlyingBalance = +await underlying.methods.balanceOf(myWalletAddress).call() / 1e18;
-    const myContractEthBalance = +web3.utils.fromWei(await web3.eth.getBalance(myContractAddress));
-    const myContractCEthBalance = await cEth.methods.balanceOf(myContractAddress).call() / 1e8;
-    const myContractUnderlyingBalance = +await underlying.methods.balanceOf(myContractAddress).call() / 1e18;
-    const myContractCTokenBalance = +await cToken.methods.balanceOf(myContractAddress).call() / 1e8;
+    const myWalletUnderlyingBalance = await underlying.callStatic.balanceOf(myWalletAddress) / Math.pow(10, underlyingDecimals);
+    const myContractEthBalance = await provider.getBalance(myContractAddress) / 1e18;
+    const myContractCEthBalance = await cEth.callStatic.balanceOf(myContractAddress) / 1e8;
+    const myContractUnderlyingBalance = await underlying.callStatic.balanceOf(myContractAddress) / Math.pow(10, underlyingDecimals);
+    const myContractCTokenBalance = await cToken.callStatic.balanceOf(myContractAddress) / 1e8;
 
     console.log(`My Wallet's   ${assetName} Balance:`, myWalletUnderlyingBalance);
     console.log(`MyContract's  ETH Balance:`, myContractEthBalance);
@@ -64,6 +54,12 @@ const logBalances = () => {
 };
 
 const main = async () => {
+  const contractIsDeployed = (await provider.getCode(myContractAddress)) !== '0x';
+
+  if (!contractIsDeployed) {
+    throw Error('MyContract is not deployed! Deploy it by running the deploy script.');
+  }
+
   await logBalances();
 
   const underlyingAsCollateral = 25;
@@ -71,19 +67,21 @@ const main = async () => {
   console.log(`\nSending ${underlyingAsCollateral} ${assetName} to MyContract so it can provide collateral...\n`);
 
   // Send underlying to MyContract before attempting the supply
-  await underlying.methods.transfer(myContractAddress, mantissa).send(fromMyWallet);
+  const transferTx = await underlying.transfer(myContractAddress, mantissa);
+  await transferTx.wait(1);
 
   await logBalances();
 
   console.log(`\nCalling MyContract.borrowEthExample with ${underlyingAsCollateral} ${assetName} as collateral...\n`);
 
-  let result = await myContract.methods.borrowEthExample(
+  const borrowTx = await myContract.borrowEthExample(
     cEthAddress,
     comptrollerAddress,
     cTokenAddress,
     underlyingAddress,
     mantissa
-  ).send(fromMyWallet);
+  );
+  let result = await borrowTx.wait(1);
 
   // See the solidity functions logs from "MyLog" event
   // console.log(JSON.stringify(result), '\n');
@@ -91,15 +89,15 @@ const main = async () => {
   await logBalances();
 
   console.log(`\nNow repaying the borrow...\n`);
-  const ethToRepayBorrow = 0.02;
-  result = await myContract.methods.myEthRepayBorrow(
+  const ethToRepayBorrow = 0.002; // hard coded borrow in contract
+  const repayTx = await myContract.myEthRepayBorrow(
     cEthAddress,
-    web3.utils.toWei(ethToRepayBorrow.toString(), 'ether')
-  ).send(fromMyWallet);
+    ethers.utils.parseEther(ethToRepayBorrow.toString()),
+    300000 // gas for the "cEth.repayBorrow" function
+  );
+  await repayTx.wait(1);
 
   await logBalances();
 };
 
-main().catch((err) => {
-  console.error('ERROR:', err);
-});
+main().catch(console.error);
