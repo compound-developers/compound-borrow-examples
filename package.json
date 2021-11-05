@@ -1,9 +1,10 @@
 {
   "name": "compound-borrow-guide",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Example code for borrowing crypto assets from Compound Protocol money markets.",
   "main": "index.js",
   "scripts": {
+    "start": "node ./scripts/run-localhost-fork.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
