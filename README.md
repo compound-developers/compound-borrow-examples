@@ -61,6 +61,7 @@ Running these scripts will give your wallet borrowed **ETH** and **Dai**. cToken
 - Run your local testnet in a second command line window **using the command above**. This will seed your account with ERC20 tokens. Look at the script file to find other ERC20 tokens that can be seeded into the account.
 - `node examples-js/web3-js/borrow-erc20-with-eth-collateral.js` To borrow Dai with ETH collateral.
 - `node examples-js/web3-js/borrow-eth-with-erc20-collateral.js` To borrow ETH with Dai collateral.
+- Check out the other examples for Ethers.js and Compound.js in the `examples-js` folder; They all do the same thing.
 
 ### Public Test Net or Main Net
 - Make sure you have a wallet with ETH for the Ethereum network you plan to interface with (Main, Ropsten, Kovan, etc.).
